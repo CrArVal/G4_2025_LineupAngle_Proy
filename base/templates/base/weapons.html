@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Armas de Valorant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .card-img-top {
+      object-fit: contain;
+      max-height: 150px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container mt-4">
+    <h2 class="mb-4 text-center">Armas de Valorant</h2>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for weapon in weapons %}
+      <div class="col">
+        <div class="card h-100 d-flex flex-column shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <!-- Imagen -->
+            {% if weapon.displayIcon %}
+              <img src="{{ weapon.displayIcon }}" alt="{{ weapon.displayName }}" class="card-img-top mb-3">
+            {% endif %}
+
+            <!-- Nombre -->
+            <h5 class="card-title">{{ weapon.displayName }}</h5>
+
+            <!-- Contenido desplegable -->
+            <div class="collapse mt-2" id="weapon-{{ weapon.uuid }}">
+              <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item"><b>UUID:</b> {{ weapon.uuid }}</li>
+                <li class="list-group-item"><b>Categoría:</b> {{ weapon.category }}</li>
+                <li class="list-group-item"><b>Skin por defecto:</b> {{ weapon.defaultSkinUuid }}</li>
+                <li class="list-group-item"><b>Asset Path:</b> {{ weapon.assetPath }}</li>
+                {% if weapon.killStreamIcon %}
+                <li class="list-group-item">
+                  <b>Kill Stream Icon:</b><br>
+                  <img src="{{ weapon.killStreamIcon }}" alt="KillStream {{ weapon.displayName }}" class="img-fluid" style="max-height:60px;">
+                </li>
+                {% endif %}
+              </ul>
+
+              {% if weapon.weaponStats %}
+              <h6>Estadísticas</h6>
+              <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item"><b>Cadencia de fuego:</b> {{ weapon.weaponStats.fireRate }}</li>
+                <li class="list-group-item"><b>Tamaño cargador:</b> {{ weapon.weaponStats.magazineSize }}</li>
+                <li class="list-group-item"><b>Velocidad al correr:</b> {{ weapon.weaponStats.runSpeedMultiplier }}</li>
+                <li class="list-group-item"><b>Tiempo de equipar:</b> {{ weapon.weaponStats.equipTimeSeconds }} s</li>
+                <li class="list-group-item"><b>Tiempo de recarga:</b> {{ weapon.weaponStats.reloadTimeSeconds }} s</li>
+                <li class="list-group-item"><b>Precisión primer disparo:</b> {{ weapon.weaponStats.firstBulletAccuracy }}</li>
+                <li class="list-group-item"><b>Balas por tiro (escopeta):</b> {{ weapon.weaponStats.shotgunPelletCount }}</li>
+                <li class="list-group-item"><b>Penetración:</b> {{ weapon.weaponStats.wallPenetration }}</li>
+                <li class="list-group-item"><b>Feature:</b> {{ weapon.weaponStats.feature }}</li>
+                <li class="list-group-item"><b>Modo de fuego:</b> {{ weapon.weaponStats.fireMode|default:"N/A" }}</li>
+                <li class="list-group-item"><b>Disparo alternativo:</b> {{ weapon.weaponStats.altFireType|default:"N/A" }}</li>
+              </ul>
+              {% endif %}
+
+              {% if weapon.weaponStats.adsStats %}
+              <h6>Estadísticas ADS</h6>
+              <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item"><b>Zoom:</b> {{ weapon.weaponStats.adsStats.zoomMultiplier }}</li>
+                <li class="list-group-item"><b>Cadencia:</b> {{ weapon.weaponStats.adsStats.fireRate }}</li>
+                <li class="list-group-item"><b>Velocidad al correr:</b> {{ weapon.weaponStats.adsStats.runSpeedMultiplier }}</li>
+                <li class="list-group-item"><b>Balas por ráfaga:</b> {{ weapon.weaponStats.adsStats.burstCount }}</li>
+                <li class="list-group-item"><b>Precisión primer disparo:</b> {{ weapon.weaponStats.adsStats.firstBulletAccuracy }}</li>
+              </ul>
+              {% endif %}
+
+              {% if weapon.weaponStats.damageRanges %}
+              <h6>Daño por rango</h6>
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Desde (m)</th>
+                      <th>Hasta (m)</th>
+                      <th>Head</th>
+                      <th>Body</th>
+                      <th>Leg</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for dmg in weapon.weaponStats.damageRanges %}
+                    <tr>
+                      <td>{{ dmg.rangeStartMeters }}</td>
+                      <td>{{ dmg.rangeEndMeters }}</td>
+                      <td>{{ dmg.headDamage }}</td>
+                      <td>{{ dmg.bodyDamage }}</td>
+                      <td>{{ dmg.legDamage }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          <!-- Botón al final -->
+          <div class="card-footer bg-transparent mt-auto">
+            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#weapon-{{ weapon.uuid }}" aria-expanded="false" aria-controls="weapon-{{ weapon.uuid }}">
+              Ver más
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

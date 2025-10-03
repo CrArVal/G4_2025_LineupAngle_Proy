@@ -1,0 +1,217 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valorant — Agentes</title>
+
+  <!-- Bootstrap 5 (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { padding-top: 4.5rem; background:#d1d7e6; color:#e6eef8; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.15)); border:0; }
+    .agent-img { width:100%; height:200px; object-fit:cover; border-bottom-left-radius: .5rem; border-bottom-right-radius: .5rem; }
+    .role-badge { font-size:.75rem; }
+    .placeholder-grid { min-height: 200px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark fixed-top bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">LineupAngle — Agentes</a>
+    <button class="btn btn-outline-light" id="refreshBtn" title="Recargar datos">Recargar</button>
+  </div>
+</nav>
+
+<main class="container">
+
+  <div class="row mb-3">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+      <h1 class="h4">Agentes</h1>
+      <small id="lastUpdated" class="text-muted"></small>
+    </div>
+  </div>
+
+  <!-- BUSCADOR SIMPLE -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input id="searchInput" class="form-control" placeholder="Buscar agente por nombre..." />
+    </div>
+  </div>
+
+  <!-- CONTENEDOR DE RESULTADOS (server-side rendering si existe 'agents') -->
+  <div id="agentsGrid" class="row g-3">
+    {% comment %} Server-side render: si pasas `agents` desde la vista Django. {% endcomment %}
+    {% if agents %}
+      {% for agent in agents %}
+       <div class="card h-100 shadow-sm">
+  {% if agent.fullPortrait %}
+    <img src="{{ agent.fullPortrait }}" alt="{{ agent.displayName }}" class="agent-img">
+  {% elif agent.displayIcon %}
+    <img src="{{ agent.displayIcon }}" alt="{{ agent.displayName }}" class="agent-img">
+  {% else %}
+    <div class="placeholder-grid d-flex align-items-center justify-content-center text-muted">
+      Sin imagen
+    </div>
+  {% endif %}
+  <div class="card-body">
+    <h5 class="card-title mb-1">{{ agent.displayName }}</h5>
+    {% if agent.role %}
+      <span class="badge bg-primary role-badge">{{ agent.role.displayName }}</span>
+    {% endif %}
+    <p class="card-text mt-2 small">{{ agent.description|default:"Sin descripción." }}</p>
+  </div>
+</div>
+ 
+      {% endfor %}
+    {% else %}
+      <!-- Si no se envió `agents`, el JS hará fetch al endpoint -->
+      <div class="col-12">
+        <div class="alert alert-info">Cargando agentes desde el endpoint... Si tienes datos en el contexto, se mostrarán en el servidor.</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Modal para detalles -->
+  <div class="modal fade" id="agentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content text-dark">
+        <div class="modal-header">
+          <h5 class="modal-title" id="agentModalTitle">Detalle agente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body" id="agentModalBody">
+          Cargando...
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Bootstrap 5 JS + Popper (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // CONFIG: endpoint interno en Django que expone los datos JSON
+  const API_ENDPOINT = "/api/agents/";  // ajusta si tu url es diferente
+
+  const refreshBtn = document.getElementById('refreshBtn');
+  const agentsGrid = document.getElementById('agentsGrid');
+  const lastUpdated = document.getElementById('lastUpdated');
+  const searchInput = document.getElementById('searchInput');
+
+  // Filtrado local
+  searchInput?.addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('.agent-card').forEach(card => {
+      const name = card.dataset.name || "";
+      card.style.display = name.includes(q) ? "" : "none";
+    });
+  });
+
+  // Función que renderiza una tarjeta (usar sólo si cargas por JS)
+  function renderAgentCard(agent) {
+    const id = agent.uuid ?? agent.id ?? '';
+    const name = agent.displayName ?? agent.name ?? 'Sin nombre';
+    const role = agent.role?.displayName ?? agent.role ?? '';
+    const img = agent.fullPortrait ?? agent.displayIcon ?? '';
+
+    const col = document.createElement('div');
+    col.className = 'col-sm-6 col-md-4 col-lg-3 agent-card';
+    col.dataset.name = name.toLowerCase();
+
+    col.innerHTML = `
+      <div class="card h-100 shadow-sm">
+        ${img ? `<img src="${img}" alt="${name}" class="agent-img">` : `<div class="placeholder-grid d-flex align-items-center justify-content-center text-muted">Sin imagen</div>`}
+        <div class="card-body">
+          <h5 class="card-title mb-1">${name}</h5>
+          ${role ? `<span class="badge bg-primary role-badge">${role}</span>` : ''}
+          <p class="card-text mt-2 small">${(agent.description ?? 'Sin descripción.').slice(0,160)}</p>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="#" class="btn btn-sm btn-outline-dark view-more" data-agent-id="${id}">Ver</a>
+        </div>
+      </div>
+    `;
+    return col;
+  }
+
+  // Load via fetch si no hay render server-side
+  async function loadAgents() {
+    try {
+      const resp = await fetch(API_ENDPOINT, {cache: "no-store"});
+      if (!resp.ok) throw new Error(`Error ${resp.status}`);
+      const json = await resp.json();
+
+      // manejar varios formatos: { data: [...] } o [...directamente]
+      let items = [];
+      if (Array.isArray(json)) items = json;
+      else if (Array.isArray(json.data)) items = json.data;
+      else {
+        // intentar extraer por claves
+        items = Object.values(json).find(v => Array.isArray(v)) || [];
+      }
+
+      // vaciar y renderizar
+      agentsGrid.innerHTML = '';
+      if (items.length === 0) {
+        agentsGrid.innerHTML = '<div class="col-12"><div class="alert alert-warning">No hay agentes en el JSON.</div></div>';
+        return;
+      }
+
+      items.forEach(agent => {
+        agentsGrid.appendChild(renderAgentCard(agent));
+      });
+
+      lastUpdated.textContent = `Última carga: ${new Date().toLocaleString()}`;
+
+      // Delegación: abrir modal al hacer click en "Ver"
+      attachViewHandlers();
+    } catch (err) {
+      console.error(err);
+      agentsGrid.innerHTML = `<div class="col-12"><div class="alert alert-danger">No se pudo cargar la API externa: ${err.message}</div></div>`;
+    }
+  }
+
+  function attachViewHandlers() {
+    document.querySelectorAll('.view-more').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const id = btn.dataset.agentId;
+        const card = btn.closest('.card');
+        const name = card?.querySelector('.card-title')?.textContent ?? 'Detalle';
+        const img = card?.querySelector('img')?.src ?? '';
+        // rellenar modal con info básica; podrías llamar a un endpoint /api/agents/<id> si lo tienes
+        document.getElementById('agentModalTitle').textContent = name;
+        document.getElementById('agentModalBody').innerHTML = `
+          ${img ? `<img src="${img}" alt="${name}" class="img-fluid mb-3" />` : ''}
+          <p>ID: <code>${id}</code></p>
+          <p>Descripción: ${card.querySelector('.card-text')?.textContent ?? ''}</p>
+        `;
+        const modal = new bootstrap.Modal(document.getElementById('agentModal'));
+        modal.show();
+      };
+    });
+  }
+
+  // Botón recargar
+  refreshBtn?.addEventListener('click', () => loadAgents());
+
+  // Si no hay tarjetas renderizadas por servidor, carga por JS
+  window.addEventListener('DOMContentLoaded', () => {
+    // detecta si ya hay cards (server-side); en tal caso, sólo attach handlers
+    if (document.querySelectorAll('.agent-card').length > 0) {
+      attachViewHandlers();
+      lastUpdated.textContent = 'Cargado en servidor';
+    } else {
+      loadAgents();
+    }
+  });
+</script>
+
+</body>
+</html>
