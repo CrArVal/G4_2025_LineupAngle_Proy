@@ -1,5 +1,6 @@
 {% include 'base/base.html' %}
 {% block content %}
+{% load static %}
 <nav class="navbar navbar-dark bg-dark fixed-top">
   <div class="container-fluid d-flex justify-content-between">
     
@@ -12,8 +13,12 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Logo centrado -->
-    <a class="navbar-brand mx-auto" href="#">LineupAngle</a>
+    <!-- Logo centrado con texto -->
+  <a class="navbar-brand mx-auto d-flex align-items-center" href="{% url 'home' %}">
+    <img src="{% static 'images/logo.png' %}" alt="Logo" 
+        style="height: 35px; margin-right: 8px; object-fit: contain;">
+    <span class="fw-bold text-white">LineupAngle</span>
+  </a>
     
     <!-- Espacio vacío para balancear -->
     <div style="width:40px;"></div>
@@ -70,4 +75,53 @@
   </div>
 </nav> 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+<!-- ESPACIO PARA EVITAR QUE EL CARRUSEL QUEDE DEBAJO DEL NAVBAR -->
+<div style="margin-top: 70px;"></div>
+
+<!-- CARRUSEL -->
+<div id="carouselExampleDark" class="carousel carousel-dark slide home-carousel" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+
+  <div class="carousel-inner">
+    <div class="carousel-item active" data-bs-interval="4000">
+      <img src="{% static 'images/carro1.png' %}" class="carrusel-img" alt="Primer slide">
+      <div class="carousel-caption d-none d-md-block text-light">
+        <h5>Explora los mejores lineups</h5>
+        <p>Encuentra estrategias optimizadas para cada mapa y agente.</p>
+      </div>
+    </div>
+
+    <div class="carousel-item" data-bs-interval="4000">
+      <img src="{% static 'images/carro2.png' %}" class="carrusel-img" alt="Segundo slide">
+      <div class="carousel-caption d-none d-md-block text-light">
+        <h5>Aprende y mejora</h5>
+        <p>Tutoriales detallados para dominar tus habilidades.</p>
+      </div>
+    </div>
+
+    <div class="carousel-item" data-bs-interval="4000">
+      <img src="{% static 'images/carro3.png' %}" class="carrusel-img" alt="Tercer slide">
+      <div class="carousel-caption d-none d-md-block text-light">
+        <h5>Únete a la comunidad</h5>
+        <p>Comparte tus estrategias con otros jugadores.</p>
+      </div>
+    </div>
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Anterior</span>
+  </button>
+
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Siguiente</span>
+  </button>
+</div>
+
 {% endblock %}

@@ -148,3 +148,23 @@ body {
     border-color: #06d8d8;
     color: var(--fondo-base);
 }
+/* ==== Estilos del carrusel ==== */
+
+/* ==== Ajuste visual del carrusel ==== */
+.carousel {
+  width: 100vw;          /* ancho completo de la ventana */
+  overflow: hidden;
+}
+
+.carrusel-img {
+  width: 100%;            /* que ocupe todo el ancho del carrusel */
+  height: 420px;          /* o ajusta al tamaño que quieras */
+  object-fit: cover;      /* recorta sin deformar */
+  object-position: center center; /* centra la imagen horizontal y verticalmente */
+  display: block;
+}
+.carousel-caption {
+  background: rgba(0, 0, 0, 0.4); /* Fondo semitransparente para mejorar legibilidad */
+  padding: 10px;
+  border-radius: 5px;
+}
