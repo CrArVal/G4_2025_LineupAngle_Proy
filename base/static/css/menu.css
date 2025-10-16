@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
+body {
+    /* Agregamos un padding-top para que el contenido no quede oculto debajo del navbar fijo */
+    padding-top: 56px; 
+}
+
+/* --- 1. ESTILOS GENERALES DE LA BARRA DE NAVEGACIÓN (NAVBAR) --- */
+.navbar.bg-dark {
+    /* Reemplaza el color de fondo por defecto de Bootstrap */
+    background-color: #1a1a1a !important; 
+    /* Añade una sombra sutil para darle profundidad */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid #333;
+}
+
+/* --- 2. ESTILOS DEL LOGO/MARCA (LineupAngle) --- */
+.navbar-brand {
+    font-family: 'Montserrat', sans-serif; /* Usa la fuente importada */
+    font-size: 1.6rem; /* Tamaño del texto del logo */
+    font-weight: 700; /* Grosor de la fuente */
+    color: #00ff8c !important; /* Color principal (verde neón) */
+    text-shadow: 0 0 5px rgba(0, 255, 140, 0.4); /* Sombra para efecto neón */
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: #ffffff !important; /* Color al pasar el mouse */
+}
+
+
+/* --- 3. ESTILOS DEL BOTÓN HAMBURGUESA (TOGGLER) --- */
+.navbar-toggler {
+    border: 1px solid rgba(0, 255, 140, 0.4); /* Color del borde del botón */
+    transition: box-shadow 0.2s ease;
+}
+
+/* Cambia el color del ícono hamburguesa (las tres líneas) */
+.navbar-dark .navbar-toggler-icon {
+    /* El ícono de Bootstrap es un SVG. Este es el original pero con el color del trazo (stroke) cambiado a nuestro verde */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 255, 140, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.navbar-toggler:focus {
+    /* Sombra al hacer clic o foco en el botón, usando nuestro color principal */
+    box-shadow: 0 0 0 0.25rem rgba(0, 255, 140, 0.25);
+}
+
+
+/* --- 4. ESTILOS DEL MENÚ LATERAL (OFFCANVAS) --- */
+.offcanvas.text-bg-dark {
+    background-color: #1c1c1c !important; /* Fondo del menú lateral, ligeramente diferente al navbar */
+    width: 280px; /* Ancho del menú */
+    border-right: 1px solid #333;
+}
+
+.offcanvas-header {
+    border-bottom: 1px solid #444; /* Línea divisora en el header */
+}
+
+.offcanvas-title {
+    color: #f8f9fa;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+}
+
+
+/* --- 5. ESTILOS DE LOS ENLACES DE NAVEGACIÓN (DENTRO DEL OFF CANVAS) --- */
+.offcanvas .nav-link {
+    color: #adb5bd; /* Color de los enlaces inactivos */
+    font-size: 1.1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 5px; /* Bordes redondeados */
+    margin-bottom: 5px; /* Espacio entre enlaces */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Estilo al pasar el mouse o seleccionar un enlace */
+.offcanvas .nav-link:hover, .offcanvas .nav-link:focus {
+    color: #ffffff;
+    background-color: #343a40;
+}
+
+/* Estilo para el enlace activo (el que tiene la clase 'active') */
+.offcanvas .nav-link.active {
+    color: #00ff8c; /* Color verde para el enlace activo */
+    font-weight: bold;
+    background-color: rgba(0, 255, 140, 0.1); /* Fondo muy sutil para el activo */
+}
+
+
+/* --- 6. ESTILOS DEL MENÚ DESPLEGABLE (DROPDOWN) --- */
+.dropdown-menu {
+    background-color: #2a2a2a; /* Fondo del menú desplegable */
+    border: 1px solid #444;
+}
+
+.dropdown-item {
+    color: #adb5bd;
+    padding: 0.6rem 1.2rem;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    color: #1c1c1c; /* Texto oscuro para que contraste con el fondo verde */
+    background-color: #00ff8c; /* Fondo verde al pasar el mouse */
+}
+
+.dropdown-divider {
+    border-top-color: #444; /* Color de la línea divisora */
+}
+
+
+/* --- 7. ESTILOS DEL FORMULARIO DE BÚSQUEDA --- */
+.offcanvas .form-control {
+    background-color: #343a40;
+    border: 1px solid #555;
+    color: #fff;
+}
+
+.offcanvas .form-control::placeholder { /* Estilo para el texto "Buscar" */
+    color: #888;
+}
+
+/* Estilo del input cuando está seleccionado (en foco) */
+.offcanvas .form-control:focus {
+    background-color: #495057;
+    color: #fff;
+    border-color: #00ff8c; /* Borde verde al seleccionar */
+    box-shadow: 0 0 0 0.2rem rgba(0, 255, 140, 0.25);
+}
+
+/* Estilos para el botón Buscar */
+.offcanvas .btn-success {
+    background-color: #00d977;
+    border-color: #00d977;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.offcanvas .btn-success:hover {
+    background-color: #00b362;
+    border-color: #00a058;
+}
