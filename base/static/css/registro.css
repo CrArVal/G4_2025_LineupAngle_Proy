@@ -6,7 +6,7 @@
     max-width: 500px;
     margin: 50px auto;
     padding: 30px;
-    background-color: #ffffff;
+    background-color: #182735;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
@@ -15,19 +15,27 @@
     margin-bottom: 25px;
     text-align: center;
     font-weight: bold;
+    color: var(--texto-principal); /* <-- Asegura que el título sea blanco */
 }
 
-/* Estilo para los mensajes de error de JavaScript */
-.invalid-feedback {
-    display: none; /* Oculto por defecto */
-    width: 100%;
-    margin-top: .25rem;
-    font-size: .875em;
-    color: #dc3545; /* Color rojo de Bootstrap para errores */
+.form-label {
+    color: var(--texto-secundario); /* <-- Usa tu color de texto secundario para las etiquetas */
 }
 
-/* Mostrar mensaje cuando el input es inválido */
-.was-validated .form-control:invalid ~ .invalid-feedback,
-.form-control.is-invalid ~ .invalid-feedback {
-    display: block;
+/* Y para los inputs, para que el texto sea blanco y el fondo sea el de la "base" */
+.form-control {
+    background-color: var(--fondo-base); /* Fondo más oscuro para los inputs */
+    color: var(--texto-principal); /* Texto blanco dentro de los inputs */
+    border: 1px solid #2a3b4c;
+}
+
+.form-control::placeholder {
+    color: var(--texto-secundario);
+}
+
+.form-control:focus {
+    background-color: var(--fondo-base);
+    color: var(--texto-principal);
+    border-color: var(--acento-secundario);
+    box-shadow: 0 0 0 0.2rem rgba(7, 248, 248, 0.25);
 }
