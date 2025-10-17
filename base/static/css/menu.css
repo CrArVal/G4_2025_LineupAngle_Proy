@@ -164,7 +164,7 @@ body {
   display: block;
 }
 .carousel-caption {
-  background: rgba(0, 0, 0, 0.4); /* Fondo semitransparente para mejorar legibilidad */
+  background: rgba(255, 255, 255, 0.4); /* Fondo semitransparente para mejorar legibilidad */
   padding: 10px;
   border-radius: 5px;
 }

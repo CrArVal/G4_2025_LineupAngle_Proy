@@ -1,0 +1,95 @@
+
+
+        .surface-card {
+            background-color: #182735;
+            border: 1px solid #2a3b4c;
+            border-radius: 8px;
+            padding: 1.5rem; 
+        }
+
+        .text-secondary-accent {
+            color: #88BEC5;
+        }
+
+        /* --- ESTILOS DE ACCESOS RÁPIDOS --- */
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            height: 100%;
+        }
+
+        .shortcut-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #FFFFFF;
+            padding: 15px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            height: 100%;
+            transition: transform 0.2s ease;
+        }
+        .shortcut-link:hover {
+            transform: scale(1.05);
+        }
+
+        /* Colores Específicos */
+        .shortcut-link.red-accent {
+            background-color: #FF4655;
+            color: #0F1923;
+        }
+        .shortcut-link.dark-surface {
+            background-color: #132a40; 
+            color: #f3f3f3;
+        }
+        .shortcut-link.medium-surface {
+            background-color: #2a3b4c;
+            color: #FFFFFF;
+        }
+
+        /* --- ESTILOS DEL CARRUSEL DE AGENTES --- */
+        .agent-box-v2 {
+            background-color: transparent;
+            text-align: center;
+            transition: transform 0.2s ease;
+            height: 250px;
+            width: 200px;
+            flex-shrink: 0; /* Evita que se encoja en el carrusel */
+        }
+        .agent-box-v2:hover {
+            transform: translateY(-5px);
+        }
+
+        .agent-box-v2 .agent-img {
+            width: 100%;
+            height: 70%; 
+            object-fit: contain;
+            object-position: top center; 
+        }
+
+        .agent-box-v2 .agent-info {
+            height: 30%;
+            padding: 10px 5px;
+            border-top: 2px solid #FF4655;
+        }
+
+        /* Contenedor con scroll horizontal */
+        .scrollable-container {
+            overflow-x: auto;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scrollable-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+
+        /* --- AJUSTES RESPONSIVOS --- */
+        @media (max-width: 767.98px) {
+            .agent-box-v2 {
+                width: 160px; /* Tarjetas un poco más pequeñas en móvil */
+                height: 220px;
+            }
+        }
