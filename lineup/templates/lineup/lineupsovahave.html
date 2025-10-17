@@ -1,232 +1,344 @@
     {% include "base/menu.html" %}
 
     <!-- Contenido dinámico -->
-     <main class="container-fluid" style="margin-top: 100px;">
+     <main class="container-fluid" style="margin-top: 50px;">
     {% block content %}
-  <style>
+<style>
+    /* VARIABLES DE COLOR CONSISTENTES CON EL PROYECTO */
     :root {
-      --dark-bg: #0d0f14;
-      --primary-color: #ff385c;
-      --secondary-color: #1e1f26;
-      --text-light: #f5f5f5;
-      --text-muted: #b0b0b0;
+        --dark-bg: #0F1923; 
+        --primary-color: #FF4655;
+        --secondary-color: #182735;
+        --accent-color: #07F0F0;
+        --text-light: #f8f9fa;
+        --text-muted: #88BEC5; 
     }
 
     body {
-      background-color: var(--dark-bg);
-      color: var(--text-light);
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+    }
+    
+    /* Tarjeta Contenedora */
+    .gallery-item-card {
+        background-color: var(--secondary-color);
+        border: 1px solid rgba(255, 255, 255, 0.1); 
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+        height: 100%; /* Asegura que la tarjeta ocupe toda la altura disponible */
     }
 
-    .navbar {
-      background-color: var(--secondary-color);
+    /* Efecto Hover en la tarjeta entera */
+    .gallery-item-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        border-color: var(--primary-color);
     }
-    .navbar-brand {
-      color: var(--primary-color);
-      font-weight: bold;
-    }
-    .navbar-brand:hover {
-      color: var(--text-light);
-    }
-    a.nav-link {
-      color: var(--text-light);
-    }
-    a.nav-link:hover {
-      color: var(--primary-color);
-    }
-
+    
     .gallery-img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-      border: 2px solid transparent;
+        width: 100%;
+        height: 180px; /* Altura fija para las imágenes de la tarjeta */
+        object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
+        cursor: pointer;
+        border: none !important;
+        padding: 0 !important;
+        transition: transform 0.3s ease;
     }
-    .gallery-img:hover {
-      transform: scale(1.05);
-      border-color: var(--primary-color);
-    }
-
-    .modal-img {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-    }
-
-    .modal-body {
-      display: flex;
-      gap: 20px;
-    }
-    @media (max-width: 768px) {
-      .modal-body {
-        flex-direction: column;
-      }
-    }
-
+    
+    /* Estilos del Modal */
     .modal-content {
-      background-color: var(--secondary-color);
-      color: var(--text-light);
+        background-color: var(--secondary-color);
+        color: var(--text-light);
     }
     .modal-header .btn-close {
-      filter: invert(1);
+        filter: invert(1);
     }
-
+    .modal-body {
+        display: flex;
+        gap: 20px;
+        max-height: 85vh; /* Se mantiene para pantallas grandes */
+        overflow-y: auto; /* Se mantiene para pantallas grandes */
+    }
+    .modal-img {
+      width: 100%;
+      height: 300px; /* Altura fija para imágenes del carrusel en escritorio */
+      object-fit: cover;
+    }
+    
+    /* Búsqueda y Títulos */
     .section-title {
-      color: var(--primary-color);
-      margin-bottom: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 2rem;
+        font-weight: bold;
+    }
+    .input-group input {
+         background-color: var(--dark-bg);
+         border-color: var(--secondary-color);
+         color: var(--text-light);
+    }
+    .input-group-text {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: var(--dark-bg);
     }
 
-    .btn-primary {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-    }
-    .btn-primary:hover {
-      background-color: #e02e52;
-      border-color: #e02e52;
+    /* Anula los márgenes negativos de Bootstrap en la galería */
+    .row.g-3.mx-0 {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
-    /* Ocultar columnas que no coinciden con filtro */
     .lineup-item {
-      display: block;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }
-  </style>
-</head>
-<body>
 
- 
+    /* ========================================================= */
+    /* RESPONSIVE - MEDIA QUERIES                      */
+    /* ========================================================= */
 
-  <div class="container py-5">
-    <h2 class="section-title text-center">Lineups Destacados</h2>
+    /* Pantallas más pequeñas (ej. móviles, hasta 768px o sm en Bootstrap) */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 0.5rem; /* Reduce el margen del modal en pantallas pequeñas */
+            max-width: none; /* Permite que el modal ocupe casi todo el ancho */
+            width: auto;
+        }
 
-    <!-- BARRA DE BÚSQUEDA -->
+        .modal-body {
+            flex-direction: column; /* Apila el carrusel y la descripción verticalmente */
+            gap: 10px; /* Reduce el espacio entre elementos apilados */
+            max-height: 90vh; /* Permite que el modal sea un poco más alto */
+            padding: 10px;
+        }
+
+        .modal-body > div { /* Afecta tanto al carrusel como a la descripción */
+            width: 100% !important; /* Ambos ocupan el 100% del ancho */
+            padding-left: 0 !important; /* Elimina el padding de la descripción cuando se apila */
+            padding-right: 0 !important;
+        }
+
+        .modal-img {
+            height: 200px; /* Reduce la altura de la imagen del modal en móvil para que quepa mejor */
+        }
+        
+        .gallery-img {
+            height: 150px; /* Ajusta la altura de las imágenes de las tarjetas en móvil */
+        }
+
+        .section-title {
+            font-size: 1.75rem; /* Ajusta el tamaño del título principal */
+        }
+    }
+
+    /* Opcional: Pantallas medianas (entre 768px y 992px) */
+    @media (min-width: 769px) and (max-width: 991px) {
+        .modal-body {
+            gap: 15px; /* Ajusta el espacio para tablets */
+        }
+        .modal-img {
+            height: 250px; /* Ajusta la altura de la imagen del modal para tablets */
+        }
+        .gallery-img {
+            height: 160px; /* Ajusta la altura de las imágenes de las tarjetas para tablets */
+        }
+    }
+
+</style>
+<div class="container-fluid py-5 px-4">
+    <h2 class="section-title text-center">Lineups Destacados de Sova</h2>
+
     <div class="row justify-content-center mb-4">
-      <div class="col-md-6">
-        <div class="input-group">
-          <input type="text" id="searchInput" class="form-control" placeholder="Buscar (ej: Sova, Viper...)">
-          <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- GALERÍA -->
-    <div class="row g-3" id="gallery">
-      <!-- Cada div.col-md-4 tiene atributo data-title para filtrar -->
-      <div class="col-md-4 lineup-item" data-title="Sova Haven">
-        <img src="https://lineupsvalorant.com/static/lineup_images/327/1.webp"
-             class="gallery-img img-thumbnail"
-             alt="Sova Haven"
-             data-bs-toggle="modal" data-bs-target="#lineupModal"
-             data-title="Sova Haven"
-             data-description="Línea para evitar el defuse desde C Long con Sova."
-             data-images='["https://lineupsvalorant.com/static/lineup_images/327/1.webp",
-                            "https://lineupsvalorant.com/static/lineup_images/327/2.webp",
-                            "https://lineupsvalorant.com/static/lineup_images/327/3.webp"]'>
-      </div>
-      <div class="col-md-4 lineup-item" data-title="Viper Bind">
-        <img src="https://lineupsvalorant.com/static/lineup_images/327/2.webp"
-             class="gallery-img img-thumbnail"
-             alt="Viper Bind"
-             data-bs-toggle="modal" data-bs-target="#lineupModal"
-             data-title="Viper Bind"
-             data-description="Línea post-plant con Viper desde A Lobby."
-             data-images='["https://lineupsvalorant.com/static/lineup_images/327/2.webp",
-                            "https://lineupsvalorant.com/static/lineup_images/327/1.webp",
-                            "https://lineupsvalorant.com/static/lineup_images/327/3.webp"]'>
-      </div>
-      <div class="col-md-4 lineup-item" data-title="Killjoy Ascent">
-        <img src="https://lineupsvalorant.com/static/lineup_images/327/3.webp"
-             class="gallery-img img-thumbnail"
-             alt="Killjoy Ascent"
-             data-bs-toggle="modal" data-bs-target="#lineupModal"
-             data-title="Killjoy Ascent"
-             data-description="Línea con Killjoy desde Catwalk hacia Tree."
-             data-images='["https://lineupsvalorant.com/static/lineup_images/327/3.webp",
-                            "https://lineupsvalorant.com/static/lineup_images/327/2.webp",
-                            "https://lineupsvalorant.com/static/lineup_images/327/1.webp"]'>
-      </div>
-      <!-- Puedes agregar más imágenes con su data-title, data-description, data-images -->
-    </div>
-  </div>
-
-  <!-- MODAL -->
-  <div class="modal fade" id="lineupModal" tabindex="-1" aria-labelledby="lineupModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header border-0">
-          <h5 class="modal-title" id="modalTitle">Lineup</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div id="carouselLineup" class="carousel slide w-50" data-bs-ride="carousel">
-            <div class="carousel-inner" id="carouselInner">
-              <!-- las imágenes del carrusel se generarán dinámicamente -->
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar (ej: Bind, Ascent, Haven....)">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselLineup" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselLineup" data-bs-slide="next">
-              <span class="carousel-control-next-icon"></span>
-            </button>
-          </div>
-          <div class="w-50 ps-3">
-            <h5>Descripción</h5>
-            <p id="modalDescription">Aquí irá la descripción de la línea.</p>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="row g-3 mx-0" id="gallery">
+        
+        <div class="col-sm-6 col-md-4 lineup-item" data-title="Sova Haven">
+            <div class="gallery-item-card h-100">
+                <img src="https://lineupsvalorant.com/static/lineup_images/106/1.webp"
+                    class="gallery-img"
+                    alt="Sova Haven"
+                    data-bs-toggle="modal" data-bs-target="#lineupModal"
+                    data-title="Sova Haven"
+                    data-description="Lanzamiento de Flecha de Reconocimiento (Recon Bolt) desde la entrada de A Link hacia A Garden.<br><br>Ideal para obtener info instantánea de los enemigos que cruzan el punto en los primeros segundos de la ronda. Es una herramienta clave para detener rushes o saber cuántos enemigos están en A Main."
+                    data-images='["https://lineupsvalorant.com/static/lineup_images/106/1.webp", "https://lineupsvalorant.com/static/lineup_images/106/2.webp", "https://lineupsvalorant.com/static/lineup_images/106/3.webp"]'>
+                
+                <div class="p-3">
+                    <h6 class="text-white mb-1">Sova | Haven Jardin A</h6>
+                    <p class="text-muted small mb-0">Inicio de ronda / Fácil</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 lineup-item" data-title="Sova Bind">
+            <div class="gallery-item-card h-100">
+                <img src="https://lineupsvalorant.com/static/lineup_images/681/1.webp"
+                    class="gallery-img"
+                    alt="Sova Bind"
+                    data-bs-toggle="modal" data-bs-target="#lineupModal"
+                    data-title="Sova Bind"
+                    data-description="Lanzamiento estratégico de **Recon Bolt** para Site B de Bind, diseñado para **cubrir todo B Heaven y B Cubby** simultáneamente.<br><br>Esta flecha es clave en el post-plant para impedir el defuse rápido o para la **iniciación de retake**."
+                    data-images='["https://lineupsvalorant.com/static/lineup_images/681/1.webp", "https://lineupsvalorant.com/static/lineup_images/681/2.webp", "https://lineupsvalorant.com/static/lineup_images/681/3.webp"]'>
+                <div class="p-3">
+                    <h6 class="text-white mb-1">Sova | Bind B Site</h6>
+                    <p class="text-muted small mb-0">Post-Plant / Medio</p>
+                </div>
+            </div>
+        </div>
 
-  <script>
+        <div class="col-sm-6 col-md-4 lineup-item" data-title="Sova Ascent">
+            <div class="gallery-item-card h-100">
+                <img src="https://lineupsvalorant.com/static/lineup_images/387/2.webp"
+                    class="gallery-img"
+                    alt="Sova Ascent"
+                    data-bs-toggle="modal" data-bs-target="#lineupModal"
+                    data-title="Sova Ascent"
+                    data-description="Lanzamiento de **Shock Dart** aéreo para **B Main o A Main** en Ascent.<br><br>Diseñado para impactar en el momento justo del *push* enemigo, infligiendo daño masivo al *entry fragger* o **deteniendo la ejecución inicial** del sitio. Requiere práctica en la carga y el rebote."
+                    data-images='["https://lineupsvalorant.com/static/lineup_images/387/2.webp", "https://lineupsvalorant.com/static/lineup_images/387/3.webp", "https://lineupsvalorant.com/static/lineup_images/387/4.webp"]'>
+                <div class="p-3">
+                    <h6 class="text-white mb-1">Sova | Ascent B</h6>
+                    <p class="text-muted small mb-0">Defensa / Difícil</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 lineup-item" data-title="Sova Haven C Long 2">
+            <div class="gallery-item-card h-100">
+                <img src="https://lineupsvalorant.com/static/lineup_images/327/1.webp"
+                    class="gallery-img"
+                    alt="Sova Haven"
+                    data-bs-toggle="modal" data-bs-target="#lineupModal"
+                    data-title="Sova Haven C Long"
+                    data-description="Lineup para datear a los enemigos al inicio de tiempo en defensa."
+                    data-images='["https://lineupsvalorant.com/static/lineup_images/327/1.webp", "URL_PASO_2", "URL_PASO_3"]'>
+                
+                <div class="p-3">
+                    <h6 class="text-white mb-1">Sova | Haven C Long</h6>
+                    <p class="text-muted small mb-0">Post-Plant / Fácil</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 lineup-item" data-title="Viper Bind 2">
+            <div class="gallery-item-card h-100">
+                <img src="https://lineupsvalorant.com/static/lineup_images/327/2.webp"
+                    class="gallery-img"
+                    alt="Viper Bind"
+                    data-bs-toggle="modal" data-bs-target="#lineupModal"
+                    data-title="Viper Bind"
+                    data-description="Línea post-plant con Viper desde A Lobby."
+                    data-images='["https://lineupsvalorant.com/static/lineup_images/327/2.webp", "URL_PASO_2", "URL_PASO_3"]'>
+                <div class="p-3">
+                    <h6 class="text-white mb-1">Viper | Bind A Site</h6>
+                    <p class="text-muted small mb-0">Post-Plant / Medio</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 lineup-item" data-title="Killjoy Ascent 2">
+            <div class="gallery-item-card h-100">
+                <img src="https://lineupsvalorant.com/static/lineup_images/327/3.webp"
+                    class="gallery-img"
+                    alt="Killjoy Ascent"
+                    data-bs-toggle="modal" data-bs-target="#lineupModal"
+                    data-title="Killjoy Ascent"
+                    data-description="Línea con Killjoy desde Catwalk hacia Tree."
+                    data-images='["https://lineupsvalorant.com/static/lineup_images/327/3.webp", "URL_PASO_2", "URL_PASO_3"]'>
+                <div class="p-3">
+                    <h6 class="text-white mb-1">Killjoy | Ascent B</h6>
+                    <p class="text-muted small mb-0">Defensa / Difícil</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="lineupModal" tabindex="-1" aria-labelledby="lineupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="modalTitle">Lineup</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="carouselLineup" class="carousel slide w-50" data-bs-ride="carousel">
+                    <div class="carousel-inner" id="carouselInner">
+                        </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselLineup" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselLineup" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+                <div class="w-50 ps-3">
+                    
+                    <h5 class="text-primary">Descripción</h5> 
+                    <div id="modalDescription" class="text-white mb-4"></div> 
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
     // Función para actualizar el modal con la imagen clicada
     const lineupModal = document.getElementById('lineupModal');
     lineupModal.addEventListener('show.bs.modal', function (event) {
-      const img = event.relatedTarget; // la imagen que disparó el modal
-      const title = img.getAttribute('data-title');
-      const description = img.getAttribute('data-description');
-      const images = JSON.parse(img.getAttribute('data-images'));
+        const img = event.relatedTarget; 
+        const title = img.getAttribute('data-title');
+        const description = img.getAttribute('data-description');
+        const images = JSON.parse(img.getAttribute('data-images'));
 
-      // Actualiza título
-      document.getElementById('modalTitle').textContent = title;
+        // Actualiza título
+        document.getElementById('modalTitle').textContent = title;
 
-      // Actualiza descripción
-      document.getElementById('modalDescription').textContent = description;
+        // CLAVE: Inyectar HTML en la descripción para los <br><br>
+        document.getElementById('modalDescription').innerHTML = description; 
 
-      // Construir carrusel dinámico
-      const carouselInner = document.getElementById('carouselInner');
-      carouselInner.innerHTML = ''; // limpiar
+        // Construir carrusel dinámico
+        const carouselInner = document.getElementById('carouselInner');
+        carouselInner.innerHTML = ''; // limpiar
 
-      images.forEach((src, index) => {
-        const divItem = document.createElement('div');
-        divItem.classList.add('carousel-item');
-        if (index === 0) {
-          divItem.classList.add('active');
-        }
-        const imgEl = document.createElement('img');
-        imgEl.classList.add('d-block', 'modal-img');
-        imgEl.src = src;
-        divItem.appendChild(imgEl);
-        carouselInner.appendChild(divItem);
-      });
+        images.forEach((src, index) => {
+            const divItem = document.createElement('div');
+            divItem.classList.add('carousel-item');
+            if (index === 0) {
+                divItem.classList.add('active');
+            }
+            const imgEl = document.createElement('img');
+            imgEl.classList.add('d-block', 'modal-img', 'w-100'); 
+            imgEl.src = src;
+            divItem.appendChild(imgEl);
+            carouselInner.appendChild(divItem);
+        });
     });
 
     // Filtro de búsqueda (lupa)
     document.getElementById('searchInput').addEventListener('input', function () {
-      const query = this.value.toLowerCase();
-      document.querySelectorAll('.lineup-item').forEach(item => {
-        const title = item.getAttribute('data-title').toLowerCase();
-        if (title.includes(query)) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
+        const query = this.value.toLowerCase();
+        document.querySelectorAll('.lineup-item').forEach(item => {
+            const title = item.getAttribute('data-title').toLowerCase();
+            if (title.includes(query)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
     });
-  </script>
-
-</body>
-</html>
+</script>
     {% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
