@@ -1,0 +1,87 @@
+{% extends 'base/menu.html' %}
+
+{% block content %}
+   
+    <div class="form-container">
+        <h2>Crear una cuenta</h2>
+        
+        <form id="registrationForm" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="username" class="form-label">Nombre de usuario</label>
+                <input type="text" class="form-control" id="username" name="username" required minlength="3" maxlength="15">
+                <div class="invalid-feedback">
+                    Por favor, ingresa un nombre de usuario (3-15 caracteres).
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+                <div class="invalid-feedback">
+                    Por favor, ingresa un correo electrónico válido.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Debe contener al menos un número, una mayúscula, una minúscula y 8 o más caracteres">
+                <div id="passwordError" class="invalid-feedback">
+                    La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                <div id="confirmPasswordError" class="invalid-feedback">
+                    Las contraseñas no coinciden.
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+            const form = document.getElementById('registrationForm');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                let isValid = true;
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirmPassword');
+                
+                // Limpiar errores previos
+                password.classList.remove('is-invalid');
+                confirmPassword.classList.remove('is-invalid');
+
+                // Validar patrón de contraseña
+                const passwordPattern = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+                if (!passwordPattern.test(password.value)) {
+                    password.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validar coincidencia de contraseñas
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.classList.add('is-invalid');
+                    isValid = false;
+                }
+                
+                // Añadir clases de validación de Bootstrap
+                form.classList.add('was-validated');
+
+                // Si todo es válido
+                if (form.checkValidity() && isValid) {
+                    alert('¡Registro exitoso!');
+                    // form.submit(); // En un futuro, esto enviará los datos al servidor
+                }
+            }, false);
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+{% endblock %}
