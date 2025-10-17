@@ -1,8 +1,13 @@
 {% extends 'base/menu.html' %}
-
+{% load static %}
 {% block content %}
    
     <div class="form-container">
+        <div class="mt-auto text-center pt-5">
+            <img src="{% static 'images/mascotasinfondo.png' %}" 
+                 alt="Mascota LineupAngle" 
+                 style="max-width: 250px; height: auto; opacity: 0.8;">
+        </div>
         <h2>Crear una cuenta</h2>
         
         <form id="registrationForm" class="needs-validation" novalidate>
@@ -41,7 +46,11 @@
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
             </div>
+            
         </form>
+        <div class="text-center mt-4">
+            <small class="text-secondary-accent">¿Ya tienes una cuenta? <a href="{% url 'login' %}" class="fw-bold">Inicia Sesión</a></small>
+        </div>
     </div>
 
     <script>

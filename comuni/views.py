@@ -6,3 +6,6 @@ import requests
 def registro(request):
     return render(request, 'comuni/registro.html')
 
+def login(request):
+    return render(request, 'comuni/login.html')
+
