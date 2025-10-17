@@ -3,338 +3,230 @@
     <!-- Contenido dinámico -->
      <main class="container-fluid" style="margin-top: 100px;">
     {% block content %}
-<style>
-    /* VARIABLES DE COLOR CONSISTENTES CON EL PROYECTO */
+  <style>
     :root {
-        --dark-bg: #0F1923; 
-        --secondary-color: #182735; 
-        --primary-color: #FF4655; 
-        --accent-color: #07F0F0;
-        --text-light: #f8f9fa;
-        --text-muted: #88BEC5; 
+      --dark-bg: #0d0f14;
+      --primary-color: #ff385c;
+      --secondary-color: #1e1f26;
+      --text-light: #f5f5f5;
+      --text-muted: #b0b0b0;
     }
 
     body {
-        background-color: var(--dark-bg);
-        color: var(--text-light);
+      background-color: var(--dark-bg);
+      color: var(--text-light);
     }
 
-    /* Galería de Lineups */
-    .gallery-item-card {
-        background-color: var(--secondary-color);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-        transition: transform 0.3s ease;
+    .navbar {
+      background-color: var(--secondary-color);
     }
-    
+    .navbar-brand {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    .navbar-brand:hover {
+      color: var(--text-light);
+    }
+    a.nav-link {
+      color: var(--text-light);
+    }
+    a.nav-link:hover {
+      color: var(--primary-color);
+    }
+
     .gallery-img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        cursor: pointer;
-        border: 3px solid transparent;
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      border: 2px solid transparent;
     }
     .gallery-img:hover {
-        transform: scale(1.05);
-        border-color: var(--primary-color);
-    }
-
-    /* ------------------------------------------------ */
-    /* MODAL: TAMAÑO CONTROLADO Y AUTOAJUSTE DE IMAGEN */
-    /* ------------------------------------------------ */
-    .modal-content {
-        background-color: var(--secondary-color);
-        color: var(--text-light);
-    }
-    .modal-header .btn-close {
-        filter: invert(1);
-    }
-    .modal-body {
-        display: flex;
-        gap: 20px;
-        /* Limita la altura del contenido del modal */
-        max-height: 85vh; 
-        overflow-y: auto; 
-    }
-    @media (max-width: 768px) {
-        .modal-body {
-            flex-direction: column;
-            max-height: 90vh; 
-        }
-    }
-    
-    /* Contenedor de relación de aspecto 16:9 para el carrusel (66% de ancho) */
-    .modal-carousel-container-wrapper {
-        position: relative;
-        width: 100%;
-        /* 56.25% para mantener relación 16:9 */
-        padding-top: 56.25%; 
-        background-color: rgba(0,0,0,0.5);
-        border-radius: 5px;
-        overflow: hidden;
-    }
-
-    .modal-carousel-container-wrapper .carousel-inner {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+      transform: scale(1.05);
+      border-color: var(--primary-color);
     }
 
     .modal-img {
-        width: 100%;
-        height: 100%; 
-        object-fit: contain; /* CLAVE: Muestra la imagen completa sin recortar */
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
     }
-    /* ------------------------------------------------ */
+
+    .modal-body {
+      display: flex;
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .modal-body {
+        flex-direction: column;
+      }
+    }
+
+    .modal-content {
+      background-color: var(--secondary-color);
+      color: var(--text-light);
+    }
+    .modal-header .btn-close {
+      filter: invert(1);
+    }
 
     .section-title {
-        color: var(--primary-color);
-        margin-bottom: 2rem;
-        font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 2rem;
     }
-    .input-group input {
-         background-color: var(--dark-bg);
-         border-color: var(--secondary-color);
-         color: var(--text-light);
-    }
-    .input-group-text {
-        background-color: var(--primary-color) !important;
-        border-color: var(--primary-color) !important;
-    }
-</style>
 
-<div class="container-fluid py-5 px-4" style="margin-top: 50px;">
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    .btn-primary:hover {
+      background-color: #e02e52;
+      border-color: #e02e52;
+    }
+
+    /* Ocultar columnas que no coinciden con filtro */
+    .lineup-item {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+ 
+
+  <div class="container py-5">
     <h2 class="section-title text-center">Lineups Destacados</h2>
 
+    <!-- BARRA DE BÚSQUEDA -->
     <div class="row justify-content-center mb-4">
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar (ej: Sova, Viper, Ascent...)">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-            </div>
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="text" id="searchInput" class="form-control" placeholder="Buscar (ej: Sova, Viper...)">
+          <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
         </div>
+      </div>
     </div>
 
+    <!-- GALERÍA -->
     <div class="row g-3" id="gallery">
-        
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Sova Haven Recon">
-            <div class="gallery-item-card">
-                <img src="https://lineupsvalorant.com/static/lineup_images/327/1.webp"
-                    class="gallery-img"
-                    alt="Sova Haven Recon"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Sova: Recon C Long (Haven)"
-                    data-description="Línea para evitar el defuse desde C Long con Sova (Post-Plant)."
-                    data-images='["https://lineupsvalorant.com/static/lineup_images/327/1.webp", "https://lineupsvalorant.com/static/lineup_images/327/2.webp", "https://lineupsvalorant.com/static/lineup_images/327/3.webp"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Sova | Haven C</h6>
-                    <p class="text-muted small mb-0">Post-Plant (Fácil)</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Viper Bind Molly">
-            <div class="gallery-item-card">
-                <img src="https://lineupsvalorant.com/static/lineup_images/327/2.webp"
-                    class="gallery-img"
-                    alt="Viper Bind Molly"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Viper: Molotov A Short (Bind)"
-                    data-description="Molotov post-plant desde B Long hacia A Site con Viper."
-                    data-images='["https://lineupsvalorant.com/static/lineup_images/327/2.webp", "https://lineupsvalorant.com/static/lineup_images/327/1.webp", "https://lineupsvalorant.com/static/lineup_images/327/3.webp"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Viper | Bind A</h6>
-                <p class="text-muted small mb-0">Post-Plant (Medio)</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Killjoy Ascent Swarm">
-            <div class="gallery-item-card">
-                <img src="https://lineupsvalorant.com/static/lineup_images/327/3.webp"
-                    class="gallery-img"
-                    alt="Killjoy Ascent Swarm"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Killjoy: Swarm Granade B (Ascent)"
-                    data-description="Setup de Killjoy para cubrir la entrada de B Main en Ascent."
-                    data-images='["https://lineupsvalorant.com/static/lineup_images/327/3.webp", "https://lineupsvalorant.com/static/lineup_images/327/2.webp", "https://lineupsvalorant.com/static/lineup_images/327/1.webp"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Killjoy | Ascent B</h6>
-                    <p class="text-muted small mb-0">Retake (Difícil)</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Brimstone Split Smoke">
-            <div class="gallery-item-card">
-                <img src="https://via.placeholder.com/600x338?text=Brimstone+Split+Smoke"
-                    class="gallery-img"
-                    alt="Brimstone Split Smoke"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Brimstone: Triple Smoke (Split)"
-                    data-description="Uso de los 3 humos para un push rápido en Mid."
-                    data-images='["https://via.placeholder.com/1280x720?text=Brimstone+Smoke+1", "https://via.placeholder.com/1280x720?text=Brimstone+Smoke+2", "https://via.placeholder.com/1280x720?text=Brimstone+Smoke+3"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Brimstone | Split Mid</h6>
-                    <p class="text-muted small mb-0">Ataque (Fácil)</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Omen Fracture One Way">
-            <div class="gallery-item-card">
-                <img src="https://via.placeholder.com/600x338?text=Omen+Fracture+One+Way"
-                    class="gallery-img"
-                    alt="Omen Fracture One Way"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Omen: One-Way B Cajas (Fracture)"
-                    data-description="Humo one-way desde el A-Main que cubre el pasillo de la tirolesa."
-                    data-images='["https://via.placeholder.com/1280x720?text=Omen+OneWay+1", "https://via.placeholder.com/1280x720?text=Omen+OneWay+2", "https://via.placeholder.com/1280x720?text=Omen+OneWay+3"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Omen | Fracture B</h6>
-                    <p class="text-muted small mb-0">Defensa (Medio)</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Raze Icebox Boom Bot">
-            <div class="gallery-item-card">
-                <img src="https://via.placeholder.com/600x338?text=Raze+Icebox+Boom+Bot"
-                    class="gallery-img"
-                    alt="Raze Icebox Boom Bot"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Raze: Boombot Limpieza (Icebox)"
-                    data-description="Boombot para limpiar el área de Nest desde Mid."
-                    data-images='["https://via.placeholder.com/1280x720?text=Raze+BoomBot+1", "https://via.placeholder.com/1280x720?text=Raze+BoomBot+2", "https://via.placeholder.com/1280x720?text=Raze+BoomBot+3"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Raze | Icebox A</h6>
-                    <p class="text-muted small mb-0">Ataque (Fácil)</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Fade Lotus Seize">
-            <div class="gallery-item-card">
-                <img src="https://via.placeholder.com/600x338?text=Fade+Lotus+Seize"
-                    class="gallery-img"
-                    alt="Fade Lotus Seize"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Fade: Seize C Lobby (Lotus)"
-                    data-description="Lanzamiento de Seize desde B Site hacia C Lobby para retrasar retake."
-                    data-images='["https://via.placeholder.com/1280x720?text=Fade+Seize+1", "https://via.placeholder.com/1280x720?text=Fade+Seize+2", "https://via.placeholder.com/1280x720?text=Fade+Seize+3"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Fade | Lotus C</h6>
-                    <p class="text-muted small mb-0">Post-Plant (Medio)</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-md-3 lineup-item" data-title="Cypher Sunset Trapwire">
-            <div class="gallery-item-card">
-                <img src="https://via.placeholder.com/600x338?text=Cypher+Sunset+Trapwire"
-                    class="gallery-img"
-                    alt="Cypher Sunset Trapwire"
-                    data-bs-toggle="modal" data-bs-target="#lineupModal"
-                    data-title="Cypher: Tripwire Mid Central (Sunset)"
-                    data-description="Cable trampa para detectar el flanqueo rápido en Mid."
-                    data-images='["https://via.placeholder.com/1280x720?text=Cypher+Trapwire+1", "https://via.placeholder.com/1280x720?text=Cypher+Trapwire+2", "https://via.placeholder.com/1280x720?text=Cypher+Trapwire+3"]'>
-                <div class="p-3">
-                    <h6 class="text-white">Cypher | Sunset Mid</h6>
-                    <p class="text-muted small mb-0">Defensa (Fácil)</p>
-                </div>
-            </div>
-        </div>
-        
+      <!-- Cada div.col-md-4 tiene atributo data-title para filtrar -->
+      <div class="col-md-4 lineup-item" data-title="Sova Haven">
+        <img src="https://lineupsvalorant.com/static/lineup_images/327/1.webp"
+             class="gallery-img img-thumbnail"
+             alt="Sova Haven"
+             data-bs-toggle="modal" data-bs-target="#lineupModal"
+             data-title="Sova Haven"
+             data-description="Línea para evitar el defuse desde C Long con Sova."
+             data-images='["https://lineupsvalorant.com/static/lineup_images/327/1.webp",
+                            "https://lineupsvalorant.com/static/lineup_images/327/2.webp",
+                            "https://lineupsvalorant.com/static/lineup_images/327/3.webp"]'>
+      </div>
+      <div class="col-md-4 lineup-item" data-title="Viper Bind">
+        <img src="https://lineupsvalorant.com/static/lineup_images/327/2.webp"
+             class="gallery-img img-thumbnail"
+             alt="Viper Bind"
+             data-bs-toggle="modal" data-bs-target="#lineupModal"
+             data-title="Viper Bind"
+             data-description="Línea post-plant con Viper desde A Lobby."
+             data-images='["https://lineupsvalorant.com/static/lineup_images/327/2.webp",
+                            "https://lineupsvalorant.com/static/lineup_images/327/1.webp",
+                            "https://lineupsvalorant.com/static/lineup_images/327/3.webp"]'>
+      </div>
+      <div class="col-md-4 lineup-item" data-title="Killjoy Ascent">
+        <img src="https://lineupsvalorant.com/static/lineup_images/327/3.webp"
+             class="gallery-img img-thumbnail"
+             alt="Killjoy Ascent"
+             data-bs-toggle="modal" data-bs-target="#lineupModal"
+             data-title="Killjoy Ascent"
+             data-description="Línea con Killjoy desde Catwalk hacia Tree."
+             data-images='["https://lineupsvalorant.com/static/lineup_images/327/3.webp",
+                            "https://lineupsvalorant.com/static/lineup_images/327/2.webp",
+                            "https://lineupsvalorant.com/static/lineup_images/327/1.webp"]'>
+      </div>
+      <!-- Puedes agregar más imágenes con su data-title, data-description, data-images -->
     </div>
-</div>
+  </div>
 
-<div class="modal fade" id="lineupModal" tabindex="-1" aria-labelledby="lineupModalLabel" aria-hidden="true">
+  <!-- MODAL -->
+  <div class="modal fade" id="lineupModal" tabindex="-1" aria-labelledby="lineupModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="modalTitle">Lineup</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                
-                <div class="col-md-8">
-                    <div id="carouselLineup" class="carousel slide" data-bs-ride="carousel">
-                        <div class="modal-carousel-container-wrapper"> 
-                            <div class="carousel-inner" id="carouselInner">
-                                </div>
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselLineup" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselLineup" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 ps-3 modal-description-container">
-                    <h5 class="text-primary">Descripción</h5>
-                    <p id="modalDescription">Aquí irá la descripción de la línea.</p>
-                    <hr class="text-muted">
-                    <h6 class="text-primary">Metadatos</h6>
-                    <p class="small text-muted mb-0">Tags: <span id="modalTags">#Agente #Mapa</span></p>
-                    <p class="small text-muted mb-0">Dificultad: <span id="modalDifficulty">Fácil</span></p>
-                </div>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h5 class="modal-title" id="modalTitle">Lineup</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+        <div class="modal-body">
+          <div id="carouselLineup" class="carousel slide w-50" data-bs-ride="carousel">
+            <div class="carousel-inner" id="carouselInner">
+              <!-- las imágenes del carrusel se generarán dinámicamente -->
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselLineup" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselLineup" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          </div>
+          <div class="w-50 ps-3">
+            <h5>Descripción</h5>
+            <p id="modalDescription">Aquí irá la descripción de la línea.</p>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Lógica para actualizar el modal con la imagen clicada
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Función para actualizar el modal con la imagen clicada
     const lineupModal = document.getElementById('lineupModal');
     lineupModal.addEventListener('show.bs.modal', function (event) {
-        const img = event.relatedTarget; 
-        const title = img.getAttribute('data-title');
-        const description = img.getAttribute('data-description');
-        const images = JSON.parse(img.getAttribute('data-images'));
+      const img = event.relatedTarget; // la imagen que disparó el modal
+      const title = img.getAttribute('data-title');
+      const description = img.getAttribute('data-description');
+      const images = JSON.parse(img.getAttribute('data-images'));
 
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalDescription').textContent = description;
+      // Actualiza título
+      document.getElementById('modalTitle').textContent = title;
 
-        const carouselInner = document.getElementById('carouselInner');
-        carouselInner.innerHTML = ''; 
+      // Actualiza descripción
+      document.getElementById('modalDescription').textContent = description;
 
-        images.forEach((src, index) => {
-            const divItem = document.createElement('div');
-            divItem.classList.add('carousel-item');
-            if (index === 0) {
-                divItem.classList.add('active');
-            }
-            const imgEl = document.createElement('img');
-            imgEl.classList.add('d-block', 'modal-img');
-            imgEl.src = src;
-            divItem.appendChild(imgEl);
-            carouselInner.appendChild(divItem);
-        });
-        
-        document.getElementById('modalTags').textContent = img.closest('.gallery-item-card').querySelector('.p-3 p:first-child').textContent;
-        document.getElementById('modalDifficulty').textContent = img.closest('.gallery-item-card').querySelector('.p-3 p:last-child').textContent;
+      // Construir carrusel dinámico
+      const carouselInner = document.getElementById('carouselInner');
+      carouselInner.innerHTML = ''; // limpiar
+
+      images.forEach((src, index) => {
+        const divItem = document.createElement('div');
+        divItem.classList.add('carousel-item');
+        if (index === 0) {
+          divItem.classList.add('active');
+        }
+        const imgEl = document.createElement('img');
+        imgEl.classList.add('d-block', 'modal-img');
+        imgEl.src = src;
+        divItem.appendChild(imgEl);
+        carouselInner.appendChild(divItem);
+      });
     });
 
-    // Filtro de búsqueda
+    // Filtro de búsqueda (lupa)
     document.getElementById('searchInput').addEventListener('input', function () {
-        const query = this.value.toLowerCase();
-        document.querySelectorAll('.lineup-item').forEach(item => {
-            const title = item.getAttribute('data-title').toLowerCase();
-            const content = item.textContent.toLowerCase(); 
-
-            if (title.includes(query) || content.includes(query)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+      const query = this.value.toLowerCase();
+      document.querySelectorAll('.lineup-item').forEach(item => {
+        const title = item.getAttribute('data-title').toLowerCase();
+        if (title.includes(query)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
     });
-</script>
+  </script>
+
+</body>
+</html>
     {% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
