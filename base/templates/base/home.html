@@ -5,62 +5,110 @@
     <main class="container" style="margin-top: 80px;">
     {% block content %}
 <style>
+    /* Estilos base del body se mantienen */
     body {
         background-color: #0F1923; /* Fondo base */
         color: #FFFFFF;
+        padding: 0 !important;
     }
+
+    /* Superficie (fondo de las tarjetas) */
     .surface-card {
         background-color: #182735; /* Superficie */
         border: none;
         border-radius: 8px;
-        padding: 1.5rem;
+        padding: 1.5rem; 
     }
     .text-secondary-accent {
-        color: #88BEC5; /* Texto secundario de la paleta */
+        color: #88BEC5; /* Texto secundario */
     }
     
-    /* Estilos del Carrusel de Agentes */
+    /* ----------------------------------------------------------------- */
+    /* ESTILOS DE ATAJOS (SOLUCIÓN FINAL: Usando CSS simple) */
+    /* ----------------------------------------------------------------- */
+    .shortcut-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+        gap: 8px; /* Espacio entre botones */
+        height: 100%;
+        padding-top: 10px;
+    }
+    .shortcut-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #FFFFFF;
+        padding: 15px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        height: 100%; /* CLAVE: Para que se estiren verticalmente */
+    }
+
+    /* Colores Específicos de los Atajos */
+    .shortcut-link.red-accent {
+        background-color: #FF4655 !important;
+        color: #0F1923 !important; /* Texto oscuro sobre color claro */
+    }
+    .shortcut-link.cyan-accent {
+        background-color: #FF4655 !important;
+        color: #0F1923 !important; /* Texto oscuro sobre color claro */
+    }
+    .shortcut-link.dark-surface {
+        background-color: #133d68 !important;
+        color: #f3f3f3 !important;
+    }
+    .shortcut-link.medium-surface {
+        background-color: #133d68 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* ----------------------------------------------------------------- */
+    /* ESTILOS DEL CARRUSEL (TRANSPARENCIA Y SCROLL) */
+    /* ----------------------------------------------------------------- */
     .agent-box-v2 {
-        background-color: #182735;
-        border-radius: 8px;
-        overflow: hidden;
+        background-color: transparent; /* Fondo Transparente */
+        border-radius: 0;
         text-align: center;
         transition: transform 0.2s;
-        height: 250px; /* Altura definida para que se vean uniformes */
-    }
-    .agent-box-v2:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        height: 250px;
+        width: 200px; /* Ancho fijo para forzar el scroll */
+        flex-shrink: 0;
     }
     .agent-box-v2 .agent-img {
         width: 100%;
         height: 70%; 
-        object-fit: cover;
+        object-fit: contain;
         object-position: top center; 
     }
     .agent-box-v2 .agent-info {
         height: 30%;
         padding: 10px 5px;
-        background-color: rgba(0, 0, 0, 0.3); /* Fondo semi-transparente */
-        border-top: 2px solid #FF4655; /* Línea de acento roja */
+        background-color: rgba(24, 39, 53, 0.8); /* Fondo semi-transparente para el texto */
+        border-top: 2px solid #FF4655;
     }
 
-    /* Oculta la barra de desplazamiento para un efecto visual más limpio */
+    /* Oculta la barra de desplazamiento */
     .scrollable-container {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
+        overflow-x: scroll; 
+        overflow-y: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        padding-bottom: 20px !important;
     }
     .scrollable-container::-webkit-scrollbar {
-        display: none;  /* Chrome, Safari y Opera */
+        display: none;
     }
+    
 </style>
 
-<div class="container py-5" style="margin-top: 50px;">
+<div class="py-5" style="margin-top: 50px;">
     
-    <div class="row mb-5 g-4">
+    <div class="row mb-5 g-4 d-flex align-items-stretch mx-0 px-4"> 
         
         <div class="col-lg-7">
-            <div class="surface-card h-100"> 
+            <div class="surface-card h-100 p-4"> 
                 <h1 class="display-5 fw-bold text-white mb-3">Mejora tu juego. Encuentra tu escuadra.</h1>
                 <p class="lead text-secondary-accent mb-4">Guías claras para nuevos, lineups para intermedios y un LFG con chat en tiempo real.</p>
                 
@@ -70,56 +118,35 @@
         </div>
 
         <div class="col-lg-5">
-            <div class="surface-card h-100">
-                <h2 class="h5 fw-bold text-white mb-3">ACCESOS RÁPIDOS</h2>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <a href="#" class="d-block p-3 text-center text-decoration-none text-white-50" style="background-color: #0F1923; border-radius: 4px;">
-                            <p class="mb-0 fw-bold small">ARMAS</p>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a href="{% url 'agents_page' %}" class="d-block p-3 text-center text-decoration-none text-white-50" style="background-color: #182735; border-radius: 4px;">
-                            <p class="mb-0 fw-bold small">AGENTES</p>
-                        </a>
-                    </div>
+            <div class="surface-card h-100 p-4 d-flex flex-column">
+                <h2 class="h5 fw-bold text-white mb-1">ACCESOS RÁPIDOS</h2>
+                
+                <div class="shortcut-grid flex-grow-1">
                     
-                    <div class="col-6">
-                        <a href="#" class="d-block p-3 text-center text-decoration-none text-white-50" style="background-color: #FF4655; border-radius: 4px;">
-                            <p class="mb-0 text-dark fw-bold small">LINEUPS</p>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a href="#" class="d-block p-3 text-center text-decoration-none text-white-50" style="background-color: #07F0F0; border-radius: 4px;">
-                            <p class="mb-0 text-dark fw-bold small">LENGUAJE</p>
-                        </a>
-                    </div>
+                    <a href="{% url 'weapons_page' %}" class="shortcut-link dark-surface">ARMAS</a>
+                    <a href="{% url 'agents_page' %}" class="shortcut-link medium-surface">AGENTES</a>
+                    
+                    <a href="#" class="shortcut-link red-accent">LINEUPS</a>
+                    <a href="#" class="shortcut-link cyan-accent">LENGUAJE</a>
 
-                    <div class="col-6">
-                        <a href="#" class="d-block p-3 text-center text-decoration-none text-white-50" style="background-color: #182735; border-radius: 4px;">
-                            <p class="mb-0 fw-bold small">NOTICIAS</p>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a href="#" class="d-block p-3 text-center text-decoration-none text-white-50" style="background-color: #0F1923; border-radius: 4px;">
-                            <p class="mb-0 fw-bold small">CALENDARIO</p>
-                        </a>
-                    </div>
+                    <a href="#" class="shortcut-link medium-surface">NOTICIAS</a>
+                    <a href="#" class="shortcut-link dark-surface">CALENDARIO</a>
+                    
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-5 d-flex align-items-stretch mx-0 px-4"> 
         
         <div class="col-md-4">
             <div class="surface-card h-100 p-3">
                 <div class="card-body">
                     <h3 class="h5 fw-bold text-white">Guía: Aim básico</h3>
-                    <p class="card-text small text-secondary-accent">Descripción breve del contenido. Mantén los acentos solo para llamadas a la acción.</p>
+                    <p class="card-text small text-secondary-accent">Conoce las bases para dominar tus disparos y ganar más duelos.</p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex gap-2 p-0 pt-3">
-                    <a href="#" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Abrir</a>
+                    <a href="#" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Ir a armas</a>
                     <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Guardar</button>
                 </div>
             </div>
@@ -129,11 +156,11 @@
             <div class="surface-card h-100 p-3">
                 <div class="card-body">
                     <h3 class="h5 fw-bold text-white">Lineup: Viper - Ascent A</h3>
-                    <p class="card-text small text-secondary-accent">Descripción breve del contenido. Mantén los acentos solo para llamadas a la acción.</p>
+                    <p class="card-text small text-secondary-accent">La estrategia con Viper para asegurar el sitio A en Ascent.</p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex gap-2 p-0 pt-3">
-                    <a href="#" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Abrir</a>
-                    <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Guardar</button>
+                    <a href="#" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Ver lineup</a>
+                    <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Mas lineup de Viper</button>
                 </div>
             </div>
         </div>
@@ -142,46 +169,79 @@
             <div class="surface-card h-100 p-3">
                 <div class="card-body">
                     <h3 class="h5 fw-bold text-white">Comunidad: Stack Oro/Plat</h3>
-                    <p class="card-text small text-secondary-accent">Descripción breve del contenido. Mantén los acentos solo para llamadas a la acción.</p>
+                    <p class="card-text small text-secondary-accent">Únete a nuestro chat exclusivo y encuentra compañeros de tu nivel.</p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex gap-2 p-0 pt-3">
-                    <button class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Abrir</button>
-                    <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Guardar</button>
+                    <button class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Unirse al Chat</button>
+                    <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Ver mas grupos</button>
                 </div>
             </div>
         </div>
     </div>
 
     <section class="mb-5">
-        <h2 class="h4 fw-bold text-white mb-4 text-center">DOMINA CADA AGENTE</h2>
+        <div class="px-4">
+            <h2 class="h4 fw-bold text-white mb-4 text-center">DOMINA CADA AGENTE</h2>
+        </div>
 
-        <div class="d-flex overflow-auto pb-3 gap-3 scrollable-container">
+        <div class="d-flex overflow-auto pb-3 gap-3 scrollable-container px-4">
             
-            {% comment %} 
-            Usaremos un bucle de Django para simular 10+ agentes y asegurar el scroll
-            Deberías reemplazar esto con un bucle real sobre tu lista de agentes:
-            {% for agent in agents %} 
-            {% endcomment %}
-            {% for i in "1234567890" %} 
-                {% with agent_name=forloop.counter|stringformat:"d" %}
-                <a href="#" class="agent-box-v2 flex-shrink-0 text-decoration-none" style="width: 200px;">
-                    <img 
-                        src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/ba51d43803082941b0274b66413b0acc972546dd-616x822.png?auto=format&fit=fill&q=80&w=352" 
-                        alt="Agente {{ agent_name }}" 
-                        class="agent-img"
-                    >
-                    <div class="agent-info">
-                        <h5 class="small fw-bold text-white mb-0">AGENTE {{ agent_name }}</h5>
-                        <p class="text-secondary-accent small mb-0">Rol</p>
-                    </div>
-                </a>
-                {% endwith %}
-            {% endfor %}
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/08b3d8822544bd327ebed0768c8b90fcec83d1a5-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 1" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Sova</h5><p class="text-secondary-accent small mb-0">Iniciador</p></div>
+            </a>
+            
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/152244f121e61ca32bdd2bea9fc5370e315664fb-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 2" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">FADE</h5><p class="text-secondary-accent small mb-0">Controlador</p></div>
+            </a>
+
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/820d36d431fff77b1e1ece39ad6f007746bd31f6-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 3" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">KillJoy</h5><p class="text-secondary-accent small mb-0">Sentinela</p></div>
+            </a>
+            
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/51e62f3c74356a7501d06feba42ac643133257d7-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 4" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Brimstone</h5><p class="text-secondary-accent small mb-0">Controlador</p></div>
+            </a>
+
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/e7099cc13a665ed2b556d514e50984393ed49967-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 5" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Fade</h5><p class="text-secondary-accent small mb-0">Iniciador</p></div>
+            </a>
+
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/7cb513c9b3eae3286449776e85753138436d553c-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 6" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Reyna</h5><p class="text-secondary-accent small mb-0">Duelista</p></div>
+            </a>
+            
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/40b4b242b68afe30d21e7f95bdcacaebca46ea60-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 7" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">RAZE</h5><p class="text-secondary-accent small mb-0">Duelista</p></div>
+            </a>
+            
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/015a083717e9687de8a741cfceddb836775b5f9f-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 8" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">OMEN</h5><p class="text-secondary-accent small mb-0">Controlador</p></div>
+            </a>
+
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/d41286dc9017bf79c0b4d907b7a260c27b0adb69-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 9" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Jett</h5><p class="text-secondary-accent small mb-0">Duelista</p></div>
+            </a>
+
+            <a href="#" class="agent-box-v2 text-decoration-none">
+                <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/2c35cef9c38283f8478d1e808b1c129f371e50b3-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Agente 10" class="agent-img">
+                <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Iso</h5><p class="text-secondary-accent small mb-0">Duelista</p></div>
+            </a>
             
         </div>
         
-        <div class="text-center mt-4">
-             <a href="{% url 'agents_page' %}" class="btn btn-danger btn-lg" style="background-color: #FF4655; border-color: #FF4655;">VER TODOS LOS AGENTES</a>
+        <div class="px-4">
+            <div class="text-center mt-4">
+                <a href="{% url 'agents_page' %}" class="btn btn-danger btn-lg" style="background-color: #FF4655; border-color: #FF4655;">VER TODOS LOS AGENTES</a>
+            </div>
         </div>
     </section>
 
