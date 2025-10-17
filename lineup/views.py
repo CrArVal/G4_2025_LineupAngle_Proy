@@ -1,3 +1,7 @@
 from django.shortcuts import render
+from django.http import JsonResponse, HttpResponseServerError
+import requests
 
-# Create your views here.
+
+def lineuphome(request):
+    return render(request, 'lineup/lineuphome.html')
