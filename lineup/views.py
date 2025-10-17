@@ -5,3 +5,5 @@ import requests
 
 def lineuphome(request):
     return render(request, 'lineup/lineuphome.html')
+def lineupsovahave(request):
+    return render(request, 'lineup/lineupsovahave.html')
