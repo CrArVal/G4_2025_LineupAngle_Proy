@@ -15,7 +15,7 @@
                 <h1 class="display-5 fw-bold text-white mb-3">Mejora tu juego. Encuentra tu escuadra.</h1>
                 <p class="lead text-secondary-accent mb-4">Guías claras para nuevos, lineups para intermedios y un LFG con chat en tiempo real.</p>
                 
-                <a href="#" class="btn btn-danger btn-lg me-3" style="background-color: #FF4655; border-color: #FF4655;">Ver lineups</a>
+                <a href="{% url 'lineuphome' %}" class="btn btn-danger btn-lg me-3" style="background-color: #FF4655; border-color: #FF4655;">Ver lineups</a>
                 <button class="btn btn-outline-info btn-lg" style="border-color: #07F0F0; color: #07F0F0;">Buscar equipo</button>
             </div>
         </div>
@@ -29,7 +29,7 @@
                     <a href="{% url 'weapons_page' %}" class="shortcut-link dark-surface">ARMAS</a>
                     <a href="{% url 'agents_page' %}" class="shortcut-link medium-surface">AGENTES</a>
                     
-                    <a href="#" class="shortcut-link red-accent">LINEUPS</a>
+                    <a href="{% url 'lineuphome' %}" class="shortcut-link red-accent">LINEUPS</a>
                     <a href="#" class="shortcut-link cyan-accent">LENGUAJE</a>
 
                     <a href="#" class="shortcut-link medium-surface">NOTICIAS</a>
