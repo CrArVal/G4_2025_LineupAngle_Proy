@@ -1,0 +1,95 @@
+/* =================================================================== */
+/* 8. MENÚ SECUNDARIO (BEGINNER NAVBAR)                                */
+/* =================================================================== */
+
+/* Posicionamiento y Fondo */
+.beginner-navbar {
+    background-color: var(--superficie);
+    margin-top: 2px; /* Ajusta a la altura de tu navbar principal */
+    position: fixed; 
+    width: 100%; 
+    z-index: 1020; 
+    border-bottom: 2px solid var(--fondo-base);
+}
+
+/* Base de los enlaces (Desktop) */
+.beginner-navbar .navbar-nav {
+    display: flex;
+    flex-direction: row; /* Horizontal en escritorio */
+    justify-content: center;
+    width: 100%;
+}
+
+.beginner-navbar .nav-link {
+    color: var(--texto-secundario);
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden; 
+    transition: color 0.3s ease-in-out;
+    margin: 0 5px; /* Espacio entre enlaces en desktop */
+    white-space: nowrap; /* Evita que "AGENTES Y ROLES" se parta en dos líneas */
+}
+
+/* --- EFECTO HOVER Y LÍNEA ANIMADA --- */
+.beginner-navbar .nav-link:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px; 
+    background-color: var(--acento-principal);
+    transform: translateX(-102%); 
+    transition: transform 0.3s ease-in-out; 
+}
+.beginner-navbar .nav-link:hover {
+    color: var(--texto-principal);
+}
+.beginner-navbar .nav-link:hover:before {
+    transform: translateX(0);
+}
+
+/* --- ESTADO ACTIVO (PÁGINA ACTUAL) --- */
+.beginner-navbar .active-link {
+    color: var(--acento-principal) !important;
+}
+.beginner-navbar .active-link:before {
+    transform: translateX(0); 
+    background-color: var(--acento-principal);
+}
+.beginner-navbar .active-link:hover {
+    color: var(--acento-principal) !important;
+}
+
+/* =================================================================== */
+/* 9. RESPONSIVIDAD PARA EL MENÚ SECUNDARIO (MÓVILES)                  */
+/* =================================================================== */
+
+/* Ajusta este valor si quieres que cambie en tablets */
+@media (max-width: 992px) { 
+    
+    /* Cambia la dirección del menú a vertical */
+    .beginner-navbar .navbar-nav {
+        flex-direction: column; /* Apila los enlaces verticalmente */
+        align-items: center;    /* Centra los enlaces */
+    }
+
+    /* Ajusta los enlaces para que ocupen el ancho y se vean bien */
+    .beginner-navbar .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 12px 0; /* Más espacio vertical para tocar */
+        margin: 0; /* Quita el margen horizontal */
+        border-bottom: 1px solid var(--superficie); 
+    }
+
+    /* Quita el borde del último enlace para un look más limpio */
+    .beginner-navbar .nav-item:last-child .nav-link {
+        border-bottom: none;
+    }
+    
+    
+}

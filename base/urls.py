@@ -12,4 +12,6 @@ urlpatterns = [
 
     path("api/maps/", views.maps_json, name="maps_json"),
     path("maps/", views.maps_page, name="maps_page"),
+
+    path("quees/", views.quees, name="quees_page"),
 ]

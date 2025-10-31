@@ -6,6 +6,7 @@ from .valorant_client import get_agents, get_weapons, get_maps
 def home(request):
     return render(request, 'base/home.html')
 
+
 def agents_json(request):
     """Endpoint que devuelve agentes en JSON"""
     try:
@@ -56,3 +57,6 @@ def maps_page(request):
     except requests.RequestException:
         maps = []
     return render(request, "base/maps.html", {"maps": maps, "lang": lang})
+
+def quees(request):
+    return render(request, 'base/quees.html')

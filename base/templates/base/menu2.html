@@ -1,0 +1,55 @@
+{% include 'base/base.html' %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/menu2.css' %}"> 
+
+<nav class="beginner-navbar p-1">
+    <div class="container-fluid">
+        
+        <ul class="navbar-nav mx-auto">
+            
+            {% with request.resolver_match.url_name as active_url %}
+            
+            <li class="nav-item">
+                <a class="nav-link {% if active_url == 'home' %}active-link{% endif %}" 
+                   href="#">
+                   Fundamentos
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if active_url == 'agente_list' or 'rol_detail' in active_url %}active-link{% endif %}" 
+                   href="#">
+                   Agentes y Roles
+                </a>
+            </li>
+                    
+            <li class="nav-item">
+                <a class="nav-link {% if active_url == 'arma_list' %}active-link{% endif %}" 
+                   href="#">
+                   Armas y Economía
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if active_url == 'mapa_list' %}active-link{% endif %}" 
+                   href="#">
+                   Mapas
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if active_url == 'glosario_list' %}active-link{% endif %}" 
+                   href="#">
+                   Glosario
+                </a>
+            </li>
+
+            {% endwith %}
+        </ul>
+    </div>
+</nav>
+
+<div style="height: 100px;"></div>
+
+{% block content %}
+{% endblock %}
