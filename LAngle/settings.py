@@ -123,3 +123,37 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = 'login' 
+
+
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+import firebase_admin
+from firebase_admin import credentials
+
+# -----------------------------------------------------
+# CONFIGURACIÓN DE FIREBASE
+# -----------------------------------------------------
+
+# Ruta a tu archivo JSON de credenciales
+FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'config', 'lineupangle-firebase-adminsdk-fbsvc-fa813c5451.json')
+
+# Inicializar Firebase si aún no está inicializado
+if not firebase_admin._apps:
+    try:
+        # Carga las credenciales del archivo JSON
+        cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
+        
+        # Inicializa la aplicación de Firebase
+        firebase_admin.initialize_app(cred)
+        
+        print("INFO: Firebase Admin SDK inicializado correctamente.")
+        
+    except FileNotFoundError:
+        print(f"ERROR: No se encontró el archivo de credenciales de Firebase en: {FIREBASE_CREDENTIALS_PATH}")
+    except Exception as e:
+        print(f"ERROR: Error al inicializar Firebase: {e}")
+
+# -----------------------------------------------------

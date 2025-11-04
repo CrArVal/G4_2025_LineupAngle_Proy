@@ -1,7 +1,7 @@
 {% extends 'base/menu.html' %}
 {% load static %}
 {% block content %}
-   
+    
     <div class="form-container">
         <div class="mt-auto text-center pt-5">
             <img src="{% static 'images/mascotasinfondo.png' %}" 
@@ -10,8 +10,8 @@
         </div>
         <h2>Crear una cuenta</h2>
         
-        <form id="registrationForm" class="needs-validation" novalidate>
-            <div class="mb-3">
+        <form id="registrationForm" class="needs-validation" novalidate method="POST">
+            {% csrf_token %} <div class="mb-3">
                 <label for="username" class="form-label">Nombre de usuario</label>
                 <input type="text" class="form-control" id="username" name="username" required minlength="3" maxlength="15">
                 <div class="invalid-feedback">
@@ -37,7 +37,7 @@
 
             <div class="mb-3">
                 <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
-                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                <input type="password" class="form-control" id="confirmPassword" name="password2" required>
                 <div id="confirmPasswordError" class="invalid-feedback">
                     Las contraseñas no coinciden.
                 </div>
@@ -57,12 +57,11 @@
         (function () {
             'use strict';
             const form = document.getElementById('registrationForm');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
             form.addEventListener('submit', function (event) {
-                event.preventDefault();
-                event.stopPropagation();
                 let isValid = true;
-                const password = document.getElementById('password');
-                const confirmPassword = document.getElementById('confirmPassword');
                 
                 // Limpiar errores previos
                 password.classList.remove('is-invalid');
@@ -81,14 +80,13 @@
                     isValid = false;
                 }
                 
-                // Añadir clases de validación de Bootstrap
-                form.classList.add('was-validated');
-
-                // Si todo es válido
-                if (form.checkValidity() && isValid) {
-                    alert('¡Registro exitoso!');
-                    // form.submit(); // En un futuro, esto enviará los datos al servidor
+                // Si el formulario de Bootstrap NO es válido o nuestra validación personalizada falló
+                if (!form.checkValidity() || !isValid) {
+                    event.preventDefault();      // ¡SOLO PREVENIR SI HAY UN ERROR!
+                    event.stopPropagation();
                 }
+                
+                form.classList.add('was-validated');
             }, false);
         })();
     </script>

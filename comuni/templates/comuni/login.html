@@ -3,27 +3,26 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
-
-<div class="form-container">
+<link rel="stylesheet" href="{% static 'css/login-register.css' %}"> <div class="form-container">
     <div class="mt-auto text-center pt-5">
-            <img src="{% static 'images/mascotasinfondo.png' %}" 
-                 alt="Mascota LineupAngle" 
-                 style="max-width: 250px; height: auto; opacity: 0.8;">
-        </div>
+        <img src="{% static 'images/mascotasinfondo.png' %}" 
+             alt="Mascota LineupAngle" 
+             style="max-width: 250px; height: auto; opacity: 0.8;">
+    </div>
     <h2>Iniciar Sesión</h2>
     
-    <form id="loginForm" class="needs-validation" novalidate>
-        <div class="mb-3">
-            <label for="email" class="form-label">Correo Electrónico</label>
-            <input type="email" class="form-control" id="email" name="email" required>
+    <form id="loginForm" class="needs-validation" novalidate method="POST">
+        {% csrf_token %} <div class="mb-3">
+            <label for="id_username" class="form-label">Nombre de Usuario</label>
+            <input type="text" class="form-control" id="id_username" name="username" required>
             <div class="invalid-feedback">
-                Por favor, ingresa un correo electrónico válido.
+                Por favor, ingresa tu nombre de usuario.
             </div>
         </div>
 
         <div class="mb-4">
-            <label for="password" class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="password" name="password" required>
+            <label for="id_password" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="id_password" name="password" required>
             <div class="invalid-feedback">
                 Por favor, ingresa tu contraseña.
             </div>
@@ -32,20 +31,19 @@
         <div class="d-grid">
             <button type="submit" class="btn btn-primary btn-lg">Ingresar</button>
         </div>
-        
-
-        
     </form>
+    
     <br>
+    
     <div class="text-center mt-2">
-                <a href="#" class="form-text text-secondary-accent text-decoration-none">
-                    ¿Olvidaste tu contraseña?
-                </a>
-            </div>
+        <a href="#" class="form-text text-secondary-accent text-decoration-none">
+            ¿Olvidaste tu contraseña?
+        </a>
+    </div>
         
-        <div class="text-center mt-4">
-            <small class="text-secondary-accent">¿No tienes una cuenta? <a href="{% url 'registro' %}" class="fw-bold">Regístrate</a></small>
-        </div>
+    <div class="text-center mt-4">
+        <small class="text-secondary-accent">¿No tienes una cuenta? <a href="{% url 'registro' %}" class="fw-bold">Regístrate</a></small>
+    </div>
 </div>
 
 <script>

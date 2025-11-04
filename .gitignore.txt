@@ -1,0 +1,37 @@
+# -------------------------------------------------------------------
+# Archivos y Carpetas Generales de Django / Python
+# -------------------------------------------------------------------
+
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+
+# Entorno virtual
+venv/
+.venv/
+
+# Base de datos SQLite (si la usas)
+db.sqlite3
+
+# Archivos de configuración de Django
+local_settings.py
+
+# Archivos de logs
+*.log
+/log/
+
+# -------------------------------------------------------------------
+# ARCHIVOS CRÍTICOS DE SEGURIDAD (FIREBASE)
+# -------------------------------------------------------------------
+
+# La carpeta donde guardamos las credenciales de seguridad
+# (Asumiendo que creaste una carpeta llamada 'config' o 'secrets')
+config/
+
+
+# Ignorar CUALQUIER archivo JSON dentro de esas carpetas, 
+# ya que contiene las credenciales de Firebase.
+config/*.json
+config/lineupangle-firebase-adminsdk-fbsvc-fa813c5451.json
+
+
