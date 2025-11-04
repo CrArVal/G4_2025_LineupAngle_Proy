@@ -1,0 +1,9 @@
+{% extends 'base/menu.html' %}
+{% block content %}
+<div class="container" style="padding-top: 150px; color: white;">
+    <h1>Estado de la Sesión</h1>
+    <p>Django piensa que estás conectado: <strong>{{ is_logged_in }}</strong></p>
+    <p>id : <strong>{{ username }}</strong></p>
+    <p>Nombre de Usuario Reconocido: <strong>{{ user.first_name|default:user.username }}</strong></p>
+</div>
+{% endblock %}

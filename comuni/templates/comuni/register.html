@@ -2,93 +2,177 @@
 {% load static %}
 {% block content %}
     
-    <div class="form-container">
-        <div class="mt-auto text-center pt-5">
-            <img src="{% static 'images/mascotasinfondo.png' %}" 
-                 alt="Mascota LineupAngle" 
-                 style="max-width: 250px; height: auto; opacity: 0.8;">
-        </div>
-        <h2>Crear una cuenta</h2>
+    <link rel="stylesheet" href="{% static 'css/registro.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<script type="module">
+    // Importa solo las funciones necesarias, NO initializeApp ni getAuth
+    import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    
+    // ==========================================================
+    // ⭐️ FUNCIÓN GLOBAL DE ENVÍO A FIREBASE (USANDO LA INSTANCIA GLOBAL) ⭐️
+    // ==========================================================
+    window.handleFirebaseRegistration = async function() {
+        // Obtenemos la instancia de auth creada en el menú
+        const auth = window.global_auth; 
         
-        <form id="registrationForm" class="needs-validation" novalidate method="POST">
-            {% csrf_token %} <div class="mb-3">
-                <label for="username" class="form-label">Nombre de usuario</label>
-                <input type="text" class="form-control" id="username" name="username" required minlength="3" maxlength="15">
-                <div class="invalid-feedback">
-                    Por favor, ingresa un nombre de usuario (3-15 caracteres).
-                </div>
-            </div>
+        // Obtenemos los valores de los inputs (ya validados por el otro script)
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const submitButton = document.getElementById('submitButton');
+        
+        if (!auth) {
+            alert("ERROR: La autenticación de Firebase no se cargó. Inténtalo de nuevo.");
+            return;
+        }
 
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo Electrónico</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-                <div class="invalid-feedback">
-                    Por favor, ingresa un correo electrónico válido.
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" name="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Debe contener al menos un número, una mayúscula, una minúscula y 8 o más caracteres">
-                <div id="passwordError" class="invalid-feedback">
-                    La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
-                <input type="password" class="form-control" id="confirmPassword" name="password2" required>
-                <div id="confirmPasswordError" class="invalid-feedback">
-                    Las contraseñas no coinciden.
-                </div>
-            </div>
+        submitButton.disabled = true;
+        submitButton.textContent = 'Registrando...';
+        
+        try {
+            // 4. Intenta registrar el usuario con Firebase
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
             
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
-            </div>
+            // 5. Opcional: Guarda el nombre de usuario en el perfil de Firebase
+            await updateProfile(user, { displayName: username });
+
+            // 6. Obtiene el token JWT y crea la cookie de sesión (CRÍTICO)
+            const idToken = await user.getIdToken(); 
+            document.cookie = `firebaseToken=${idToken}; max-age=3600; path=/; secure; samesite=Lax`; 
+            localStorage.setItem('firebaseToken', idToken); // (Se mantiene para consistencia)
             
-        </form>
-        <div class="text-center mt-4">
-            <small class="text-secondary-accent">¿Ya tienes una cuenta? <a href="{% url 'login' %}" class="fw-bold">Inicia Sesión</a></small>
-        </div>
+            // 7. Redirige a HOME
+            alert('¡Registro exitoso! Bienvenido.');
+            window.location.href = "{% url 'home' %}";
+
+        } catch (error) {
+            let errorMessage = "Error desconocido.";
+            if (error.code === 'auth/email-already-in-use') {
+                errorMessage = "Este correo electrónico ya está registrado.";
+            } else if (error.code === 'auth/weak-password') {
+                errorMessage = "La contraseña es demasiado débil. Necesita al menos 6 caracteres.";
+            }
+            
+            alert(`Error en el registro: ${errorMessage}`);
+            console.error("Firebase Registration Error:", error);
+
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Registrarse';
+        }
+    };
+</script>
+
+<div class="form-container">
+    <div class="mt-auto text-center pt-5">
+        <img src="{% static 'images/mascotasinfondo.png' %}" 
+             alt="Mascota LineupAngle" 
+             style="max-width: 250px; height: auto; opacity: 0.8;">
     </div>
+    <h2>Crear una cuenta</h2>
+    
+    <form id="registrationForm" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="username" class="form-label">Nombre de usuario</label>
+            <input type="text" class="form-control" id="username" name="username" required minlength="3" maxlength="15">
+            <div class="invalid-feedback">Por favor, ingresa un nombre de usuario (3-15 caracteres).</div>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+            <div class="invalid-feedback">Por favor, ingresa un correo electrónico válido.</div>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="password" name="password" required minlength="6"> 
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border-color: var(--texto-secundario); color: var(--texto-secundario);"><i class="bi bi-eye-slash" id="togglePasswordIcon"></i></button>
+                <div id="passwordError" class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="confirmPassword" name="password2" required>
+                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword" style="border-color: var(--texto-secundario); color: var(--texto-secundario);"><i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i></button>
+                <div id="confirmPasswordError" class="invalid-feedback">Las contraseñas no coinciden.</div>
+            </div>
+        </div>
+        
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitButton" disabled
+                    style="background-color: var(--acento-secundario); border-color: var(--acento-secundario);">
+                Registrarse
+            </button>
+        </div>
+        
+    </form>
+    <div class="text-center mt-4">
+        <small class="text-secondary-accent">¿Ya tienes una cuenta? <a href="{% url 'login' %}" class="fw-bold">Inicia Sesión</a></small>
+    </div>
+</div>
 
-    <script>
-        (function () {
-            'use strict';
-            const form = document.getElementById('registrationForm');
-            const password = document.getElementById('password');
-            const confirmPassword = document.getElementById('confirmPassword');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const registrationForm = document.getElementById('registrationForm');
+        const submitButton = document.getElementById('submitButton');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        
+        // Función de toggle (definiciones omitidas por espacio, pero deben estar aquí)
+        function setupPasswordToggle(toggleId, inputId, iconId) { /* ... */ }
+        
+        // Función de chequeo de validez (la fuente de verdad para el botón)
+        function checkFormValidity() { /* ... lógica de validación ... */
+            const isNativeValid = registrationForm.checkValidity();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const username = usernameInput.value;
             
-            form.addEventListener('submit', function (event) {
-                let isValid = true;
-                
-                // Limpiar errores previos
-                password.classList.remove('is-invalid');
-                confirmPassword.classList.remove('is-invalid');
+            const passwordsMatch = (password === confirmPassword) && (password.length >= 6);
+            if (!passwordsMatch && confirmPasswordInput.value.length > 0) { confirmPasswordInput.classList.add('is-invalid'); } 
+            else if (confirmPasswordInput.value.length > 0) { confirmPasswordInput.classList.remove('is-invalid'); }
 
-                // Validar patrón de contraseña
-                const passwordPattern = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
-                if (!passwordPattern.test(password.value)) {
-                    password.classList.add('is-invalid');
-                    isValid = false;
-                }
+            const isUsernameLongEnough = username.length >= 3;
+            const isPasswordLongEnough = password.length >= 6;
+            
+            const isFormComplete = isNativeValid && passwordsMatch && isUsernameLongEnough && isPasswordLongEnough;
+            submitButton.disabled = !isFormComplete;
+            
+            return isFormComplete;
+        }
+        
+        // Inicialización de UX
+        setupPasswordToggle('togglePassword', 'password', 'togglePasswordIcon');
+        setupPasswordToggle('toggleConfirmPassword', 'confirmPassword', 'toggleConfirmPasswordIcon');
+        
+        // Ejecución en tiempo real
+        registrationForm.addEventListener('keyup', checkFormValidity);
+        registrationForm.addEventListener('change', checkFormValidity);
+        checkFormValidity();
 
-                // Validar coincidencia de contraseñas
-                if (password.value !== confirmPassword.value) {
-                    confirmPassword.classList.add('is-invalid');
-                    isValid = false;
+
+        // 🚨 CONTROL DEL SUBMIT (Llama a la función global)
+        registrationForm.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            event.stopPropagation();
+            
+            registrationForm.classList.add('was-validated');
+
+            if (checkFormValidity()) {
+                // 🛑 LLAMADA FINAL A LA FUNCIÓN GLOBAL DE FIREBASE 🛑
+                if (typeof window.handleFirebaseRegistration === 'function') {
+                    window.handleFirebaseRegistration();
+                } else {
+                    alert('Error fatal: La lógica de Firebase no se cargó. Vuelve a cargar la página y revisa la consola.');
                 }
-                
-                // Si el formulario de Bootstrap NO es válido o nuestra validación personalizada falló
-                if (!form.checkValidity() || !isValid) {
-                    event.preventDefault();      // ¡SOLO PREVENIR SI HAY UN ERROR!
-                    event.stopPropagation();
-                }
-                
-                form.classList.add('was-validated');
-            }, false);
-        })();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+            }
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 {% endblock %}

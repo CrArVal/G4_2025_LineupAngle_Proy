@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,8 +48,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'comuni.middleware.FirebaseAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'LAngle.urls'
@@ -64,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'comuni.context_processors.firebase_config',
             ],
         },
     },
@@ -136,6 +139,15 @@ from firebase_admin import credentials
 # -----------------------------------------------------
 # CONFIGURACIÓN DE FIREBASE
 # -----------------------------------------------------
+FIREBASE_CLIENT_CONFIG = {
+   
+    'apiKey': 'AIzaSyB5ESUcoeBXw4jILK9f0BV71z6VnUTP-BI',
+    'authDomain': 'lineupangle.firebaseapp.com',
+    'projectId': 'lineupangle',
+    'storageBucket': 'lineupangle.firebasestorage.app',
+    'messagingSenderId': '841286618421',
+    'appId': '1:841286618421:web:7f6a1171a7cb96a0bb507c'
+}
 
 # Ruta a tu archivo JSON de credenciales
 FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'config', 'lineupangle-firebase-adminsdk-fbsvc-fa813c5451.json')

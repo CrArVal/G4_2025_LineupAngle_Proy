@@ -1,9 +1,70 @@
 {% extends 'base/menu.html' %}
 {% load static %}
-
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/login_styles.css' %}">
-<link rel="stylesheet" href="{% static 'css/login-register.css' %}"> <div class="form-container">
+
+<link rel="stylesheet" href="{% static 'css/registro.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<script type="module">
+    // Importa solo las funciones necesarias para el login
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    
+    // ==========================================================
+    // ⭐️ FUNCIÓN GLOBAL DE ENVÍO A FIREBASE (USANDO LA INSTANCIA GLOBAL) ⭐️
+    // ==========================================================
+    window.handleFirebaseLogin = async function() {
+        // Obtenemos la instancia de auth creada en el menú
+        const auth = window.global_auth; 
+
+        // Obtenemos los valores de los inputs (ya validados)
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const submitButton = document.getElementById('submitButton');
+        
+        if (!auth) {
+            alert("ERROR: La autenticación de Firebase no se cargó. Vuelve a cargar la página.");
+            return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Ingresando...';
+        
+        try {
+            // 3. Intenta iniciar sesión con Firebase
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // 4. Si el login en Firebase fue exitoso, obtiene el token JWT
+            const idToken = await user.getIdToken(); 
+
+            // 5. Crea la Cookie y LocalStorage para la sesión de Django
+            document.cookie = `firebaseToken=${idToken}; max-age=3600; path=/; secure; samesite=Lax`; 
+            localStorage.setItem('firebaseToken', idToken);
+            
+            // 6. Recarga la página: El middleware de Django leerá el token 
+            window.location.href = "{% url 'home' %}";
+
+        } catch (error) {
+            // 7. Manejo de errores de Firebase
+            let errorMessage = "Error desconocido.";
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                errorMessage = "Credenciales incorrectas. Revisa tu email y contraseña.";
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = "El formato del correo electrónico es inválido.";
+            }
+            
+            alert(`Error al iniciar sesión: ${errorMessage}`);
+            console.error("Firebase Login Error:", error);
+
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Ingresar';
+        }
+    };
+</script>
+
+
+<div class="form-container">
     <div class="mt-auto text-center pt-5">
         <img src="{% static 'images/mascotasinfondo.png' %}" 
              alt="Mascota LineupAngle" 
@@ -11,25 +72,29 @@
     </div>
     <h2>Iniciar Sesión</h2>
     
-    <form id="loginForm" class="needs-validation" novalidate method="POST">
-        {% csrf_token %} <div class="mb-3">
-            <label for="id_username" class="form-label">Nombre de Usuario</label>
-            <input type="text" class="form-control" id="id_username" name="username" required>
+    <form id="loginForm" class="needs-validation" novalidate>
+        
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="email" name="email" required>
             <div class="invalid-feedback">
-                Por favor, ingresa tu nombre de usuario.
+                Por favor, ingresa un correo electrónico válido.
             </div>
         </div>
 
         <div class="mb-4">
-            <label for="id_password" class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="id_password" name="password" required>
+            <label for="password" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="password" name="password" required minlength="6"> 
             <div class="invalid-feedback">
-                Por favor, ingresa tu contraseña.
+                La contraseña debe tener al menos 6 caracteres.
             </div>
         </div>
         
         <div class="d-grid">
-            <button type="submit" class="btn btn-primary btn-lg">Ingresar</button>
+            <button type="submit" class="btn btn-primary btn-lg" id="submitButton" disabled
+                    style="background-color: var(--acento-principal); border-color: var(--acento-principal);">
+                Ingresar
+            </button>
         </div>
     </form>
     
@@ -42,22 +107,55 @@
     </div>
         
     <div class="text-center mt-4">
-        <small class="text-secondary-accent">¿No tienes una cuenta? <a href="{% url 'registro' %}" class="fw-bold">Regístrate</a></small>
+        <small class="text-secondary-accent">¿No tienes una cuenta? <a href="{% url 'register' %}" class="fw-bold">Regístrate</a></small>
     </div>
 </div>
 
 <script>
-    (function () {
-        'use strict';
-        const form = document.getElementById('loginForm');
-        form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('loginForm');
+        const submitButton = document.getElementById('submitButton');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        
+        // Función de chequeo de validez (la fuente de verdad para el botón)
+        function checkFormValidity() {
+            const isNativeValid = loginForm.checkValidity();
+            const password = passwordInput.value;
+            const email = emailInput.value;
+            
+            // 1. Longitud de contraseña y verificación simple de email
+            const isCustomValid = (password.length >= 6) && (email.trim() !== '');
+            
+            const isFormComplete = isNativeValid && isCustomValid;
+            submitButton.disabled = !isFormComplete;
+            return isFormComplete;
+        }
+
+        // Ejecución en tiempo real
+        loginForm.addEventListener('keyup', checkFormValidity);
+        loginForm.addEventListener('change', checkFormValidity);
+        checkFormValidity();
+
+
+        // 🚨 CONTROL DEL SUBMIT (Punto clave para evitar el GET)
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            event.stopPropagation();
+            
+            loginForm.classList.add('was-validated');
+
+            if (checkFormValidity()) {
+                // 🛑 LLAMADA A LA FUNCIÓN GLOBAL DE FIREBASE 🛑
+                if (typeof window.handleFirebaseLogin === 'function') {
+                    window.handleFirebaseLogin();
+                } else {
+                    alert('Error fatal: La lógica de Firebase no se cargó correctamente.');
+                }
             }
-            form.classList.add('was-validated');
-        }, false);
-    })();
+        });
+    });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 {% endblock %}
