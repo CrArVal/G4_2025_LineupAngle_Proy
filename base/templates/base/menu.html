@@ -112,17 +112,13 @@
         console.error("FIREBASE CONFIG ERROR: Fallo al parsear la configuración del DOM.", e);
     }
 
-    // 🛑 SOLUCIÓN AL ERROR DUPLICATE-APP 🛑
+    // 🛑 INICIALIZACIÓN GLOBAL CENTRALIZADA 🛑
     let app;
     if (getApps().length === 0) {
-        // Si no hay apps, la inicializamos
         app = initializeApp(firebaseConfig);
     } else {
-        // Si ya existe (cargada por otra parte), usamos la instancia existente
         app = getApp();
     }
-
-    // ⭐️ HACEMOS EL OBJETO 'auth' ACCESIBLE GLOBALMENTE ⭐️
     window.global_auth = getAuth(app); 
     
     // ==========================================================
@@ -140,7 +136,6 @@
             event.preventDefault(); 
             
             if (window.global_auth) {
-                // 1. Cierra la sesión en Firebase 
                 try {
                     await signOut(window.global_auth); 
                 } catch (error) {
@@ -148,12 +143,28 @@
                 }
             }
             
-            // 2. BORRA LA COOKIE y LocalStorage
+            // 1. BORRA LA COOKIE y LocalStorage
             deleteFirebaseCookie();
             localStorage.removeItem('firebaseToken'); 
 
-            // 3. Redirige a la URL de logout de Django. 
-            window.location.href = "{% url 'logout' %}";
+            // 🚨 2. SOLUCIÓN AL ERROR 405: Envía una solicitud POST dinámica 🚨
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{% url 'logout' %}";
+            
+            // Crea y adjunta el token CSRF (obtenido de las cookies)
+            const csrfTokenMatch = document.cookie.match(/csrftoken=([^;]+)/);
+            if (csrfTokenMatch) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'csrfmiddlewaretoken';
+                input.value = csrfTokenMatch[1];
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit(); // Esto envía la solicitud como POST, resolviendo el 405
         });
     }
 </script>
