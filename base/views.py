@@ -63,3 +63,6 @@ def quees(request):
 
 def noticias(request):
     return render(request, 'base/noticias.html')
+
+def nosotros(request):
+    return render(request, 'base/nosotros.html')

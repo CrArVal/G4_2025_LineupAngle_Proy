@@ -1,0 +1,91 @@
+/* ========================================================= */
+/* ESTILOS DE LA PÁGINA NOSOTROS (ABOUT US) */
+/* ========================================================= */
+
+/* Variables (Definidas en el root por consistencia) */
+:root {
+    --dark-bg: #0F1923; 
+    --primary-color: #FF4655; /* Rojo de acento */
+    --secondary-color: #182735; /* Superficie de tarjetas */
+    --accent-color: #07F0F0; /* Cian de acento */
+    --text-light: #f8f9fa;
+    --text-muted: #88BEC5; 
+}
+
+/* Estilos específicos del Título y Logos */
+.title-logo {
+    /* CAMBIO CLAVE: Aumentar tamaño y opacidad para visibilidad */
+    width: 120px; 
+    opacity: 0.4; 
+    transition: all 0.3s ease;
+}
+@media (max-width: 992px) { 
+    .title-logo {
+        width: 80px; /* Tamaño más pequeño en móviles */
+        opacity: 0.3; /* Ligeramente menos opacidad en móviles */
+    }
+}
+.d-flex h1.fw-bold {
+    /* Anula el margen inferior de h1 cuando está en un flexbox */
+    margin-bottom: 0 !important; 
+}
+
+/* Títulos de Sección */
+.section-title-alt {
+    color: var(--accent-color); /* Cian para "Nuestra Misión", "El Equipo", etc. */
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+}
+
+/* 1. Tarjetas del Equipo (team-card) y Visión/Valores */
+.team-card {
+    /* Fondo de la tarjeta */
+    background-color: var(--secondary-color);
+    border: 1px solid transparent; /* Necesario para que el hover se vea sin saltos */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra oscura para profundidad */
+    transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
+    height: 100%; 
+}
+
+.team-card:hover {
+    transform: translateY(-5px); /* Pequeño lift al pasar el mouse */
+    border-color: var(--primary-color); /* Borde rojo al hacer hover */
+    box-shadow: 0 8px 20px rgba(255, 70, 85, 0.3);
+}
+
+.team-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%; /* Circular */
+    border: 3px solid var(--accent-color); /* Borde cian */
+    margin-bottom: 15px;
+    display: block; /* Centrado */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.team-role {
+    color: var(--primary-color); /* Rojo para el cargo */
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.team-description {
+    font-size: 0.9rem;
+    color: var(--text-muted); /* Gris/Cian claro para el texto secundario */
+}
+
+/* Estilos para los botones que usan acento secundario */
+.btn-outline-accent {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+.btn-outline-accent:hover {
+    background-color: var(--accent-color);
+    color: var(--dark-bg);
+}
