@@ -1,0 +1,68 @@
+/* Estilos de la Tarjeta */
+.news-card {
+    background-color: var(--secondary-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    color: var(--text-light); 
+    display: flex; 
+    flex-direction: column;
+    height: 100%; 
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    border-color: var(--primary-color);
+}
+
+/* Contenedor de la Imagen (Para relación 16:9) */
+.news-image-container {
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    position: relative;
+    overflow: hidden;
+    /* Para que el texto que sigue al contenedor fluya */
+    flex-shrink: 0; 
+}
+
+.news-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    transition: transform 0.5s ease;
+}
+
+.news-card:hover .news-img {
+    transform: scale(1.05);
+}
+
+/* Título de la Tarjeta */
+.news-title {
+    font-size: 1.15em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 0;
+    white-space: normal; 
+    overflow: visible; 
+    text-overflow: clip; 
+    word-break: break-word; 
+}
+
+.news-category {
+    font-weight: bold;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+/* Resumen/Texto Secundario */
+.news-summary {
+    color: var(--text-muted); 
+    font-size: 0.9em;
+    flex-grow: 1; 
+}

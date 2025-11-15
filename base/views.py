@@ -60,3 +60,6 @@ def maps_page(request):
 
 def quees(request):
     return render(request, 'base/quees.html')
+
+def noticias(request):
+    return render(request, 'base/noticias.html')

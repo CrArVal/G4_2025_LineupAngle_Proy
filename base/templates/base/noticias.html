@@ -1,0 +1,216 @@
+{% include "base/menu.html" %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/noticias.css' %}">
+
+<main class="container-fluid" style="margin-top: 100px;">
+{% block content %}
+
+<div class="container-fluid py-5 px-4" style="margin-top: 50px;">
+    <h1 class="text-center fw-bold mb-5" style="color: #FF4655;">NOTICIAS</h1>
+    
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar (ej: Sport, Anuncios...)">
+                <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mx-0" id="news-grid">
+        
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://charityvote.riotgames.com/es-mx/" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/socialimpact.png' %}" class="news-img" alt="Social Impact Fund">
+                </div>
+                
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #FF4655;">ANUNCIOS</span> <span class="news-category" style="color: #f3d965;">13/11/2025</span>
+                    </div>
+                    
+                    <h5 class="news-title">La comunidad recaudó más de cinco millones de dólares. ¡Elige una organización benéfica!</h5>
+                    
+                    <p class="news-summary mt-2">
+                        La comunidad ha recaudado cinco millones de dólares en el Fondo de Impacto Social de Riot Games. Vota ahora para ayudar a decidir a las causas que apoyaremos con donaciones.
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://playvalorant.com/es-mx/news/game-updates/valorant-patch-notes-11-10/" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/actualizacion11.png' %}" class="news-img" alt="Versión 11.10">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #07F0F0;">ACTUALIZACIONES DEL JUEGO</span>  <span class="news-category" style="color: #f3d965;">11/11/2025</span>
+                    </div>
+                    <h5 class="news-title">Versión 11.10 de VALORANT y ajustes a Clove y Harbor</h5>
+                    <p class="news-summary mt-2">
+                        Rediseño de Harbor, actualizaciones de funcionalidad, ajustes a Clove y corrección de errores.
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://www.youtube.com/watch?v=TaDPU320jiM" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/promochampion.png' %}" class="news-img" alt="Game Changers">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #FF4655;">ESPORTS</span>  <span class="news-category" style="color: #f3d965;">11/11/2025</span>
+                    </div>
+                    <h5 class="news-title">DOMINA | Video promocional de VALORANT Game Changers Championship con M.I.A de KATSEYE</h5>
+                    <p class="news-summary mt-2">
+                        Sintoniza el VCT Game Changers Championship del 20 al 30 de noviembre en Seúl, Corea del Sur.
+                    </p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://valorantesports.com/es-MX/news/game-changers-championship-pickems-powered-by-aws" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/aws.png' %}" class="news-img" alt="Changers Championship">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #07F0F0;">COMUNIDAD</span>  <span class="news-category" style="color: #f3d965;">10/11/2025</span>
+                    </div>
+                    <h5 class="news-title">Pick'Ems de Game Changers Championship, auspiciado por AWS</h5>
+                    <p class="news-summary mt-2">
+                        Pick'Ems comenzará el 13 de noviembre en el sitio web y en el cliente del juego. ¡Prepárate!Pick'Ems comenzará el 13 de noviembre en el sitio web y en el cliente del juego. ¡Prepárate!
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://www.youtube.com/watch?v=o9eEp0Af-nY" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/rediseño.png' %}" class="news-img" alt="REDISEÑO">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #FF4655;">ANUNCIO</span>  <span class="news-category" style="color: #f3d965;">09/11/2025</span>
+                    </div>
+                    <h5 class="news-title">Rediseño de Harbor // Momento de gloria - VALORANT</h5>
+                    <p class="news-summary mt-2">
+                        El brazalete de Harbor recibió una mejora con nuevas formas de azotar las olas contra sus oponentes.
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://valorantesports.com/es-MX/news/valorant-game-changers-championship-2025-everything-you-need-to-know" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/Championship.png' %}" class="news-img" alt="ESPORT">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #07F0F0;">ESPORT</span>  <span class="news-category" style="color: #f3d965;">07/11/2025</span>
+                    </div>
+                    <h5 class="news-title">VALORANT Game Changers Championship 2025: todo lo que necesitas saber</h5>
+                    <p class="news-summary mt-2">
+                       ¡Más información sobre Game Changers Championship 2025! ¡Competidoras, horarios, llaves y más!
+                    </p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://playvalorant.com/es-mx/news/game-updates/valorant-patch-notes-11-09/" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/AMF.png' %}" class="news-img" alt="Requisito cuentas">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #FF4655;">ACTUALIZACIONES DEL JUEGO</span>  <span class="news-category" style="color: #f3d965;">28/10/2025</span>
+                    </div>
+                    <h5 class="news-title">Versión 11.09 de VALORANT</h5>
+                    <p class="news-summary mt-2">
+                        Requisito de AMF para cuentas compartidas, actualizaciones de funcionalidad y corrección de errores.
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://valorantesports.com/es-MX/news/everything-about-the-game-changers-americas-lcq-2025" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/changeramerica.png' %}" class="news-img" alt="Changers Americas">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #07F0F0;">ESPORT</span>  <span class="news-category" style="color: #f3d965;">21/10/2025</span>
+                    </div>
+                    <h5 class="news-title">Toda la información sobre el Game Changers Americas LCQ 2025</h5>
+                    <p class="news-summary mt-2">
+                        Formato, calendario y detalles del torneo para decidir la segunda plaza para el campeonato en Seúl
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 news-item">
+            <a href="https://playvalorant.com/es-mx/news/game-updates/act-6-battlepass-bug/" class="news-card h-100">
+                <div class="news-image-container">
+                    <img src="{% static 'images/promochampion.png' %}" class="news-img" alt="ERROR PASE">
+                </div>
+                <div class="p-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="news-category" style="color: #07F0F0;">ACTUALIZACIONES DEL JUEGO</span>  <span class="news-category" style="color: #f3d965;">16/10/2025</span>
+                    </div>
+                    <h5 class="news-title">Error en el Pase del Acto 6</h5>
+                    <p class="news-summary mt-2">
+                       Corregimos el error donde los jugadores no recibieron los RadP (RP) correctos en el Pase de Batalla.
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('#searchInput');
+        const newsItems = document.querySelectorAll('.news-item');
+
+        function filterNews() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+
+            newsItems.forEach(item => {
+                const titleElement = item.querySelector('.news-title');
+                const categoryElement = item.querySelector('.news-category');
+                
+
+                const title = titleElement ? titleElement.textContent.trim().toLowerCase() : '';
+                const categoryText = categoryElement ? categoryElement.textContent.trim().toLowerCase() : '';
+                
+                if (title.includes(searchTerm) || categoryText.includes(searchTerm)) {
+                    item.style.display = 'block'; 
+                } else {
+                    item.style.display = 'none'; 
+                }
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', filterNews);
+        }
+    });
+</script>
+   <footer class="text-center mt-5 pt-3 border-top border-secondary">
+        <p class="small text-white-50">© 2025 LINEUP ANGLE</p>
+    </footer>
+{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>

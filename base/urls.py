@@ -14,4 +14,5 @@ urlpatterns = [
     path("maps/", views.maps_page, name="maps_page"),
 
     path("quees/", views.quees, name="quees"),
+    path("noticias/", views.noticias, name="noticias"),
 ]
