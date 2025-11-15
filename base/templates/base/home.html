@@ -20,20 +20,23 @@
             </div>
         </div>
 
-        <div class="col-lg-5">
+    <div class="col-lg-5">
             <div class="surface-card h-100 p-4 d-flex flex-column">
                 <h2 class="h5 fw-bold text-white mb-1">ACCESOS RÁPIDOS</h2>
                 
                 <div class="shortcut-grid flex-grow-1">
                     
-                    <a href="{% url 'weapons_page' %}" class="shortcut-link dark-surface">ARMAS</a>
-                    <a href="{% url 'agents_page' %}" class="shortcut-link medium-surface">AGENTES</a>
+                    <a href="{% url 'weapons_page' %}" class="shortcut-link dark-surface"><i class="fas fa-gun me-2"></i> ARMAS</a>
                     
-                    <a href="{% url 'lineuphome' %}" class="shortcut-link red-accent">LINEUPS</a>
-                    <a href="#" class="shortcut-link cyan-accent">LENGUAJE</a>
+                    <a href="{% url 'agents_page' %}" class="shortcut-link medium-surface"><i class="fas fa-user-friends me-2"></i> AGENTES</a>
+                    
+                    <a href="{% url 'lineuphome' %}" class="shortcut-link red-accent"><i class="bi bi-bullseye me-2"></i> LINEUPS</a>
+                    
+                    <a href="#" class="shortcut-link cyan-accent"><i class="fas fa-comments me-2"></i> LENGUAJE</a>
 
-                    <a href="{% url 'noticias' %}" class="shortcut-link medium-surface">NOTICIAS</a>
-                    <a href="#" class="shortcut-link dark-surface">CALENDARIO</a>
+                    <a href="{% url 'noticias' %}" class="shortcut-link medium-surface"><i class="fas fa-newspaper me-2"></i> NOTICIAS</a>
+                    
+                    <a href="#" class="shortcut-link dark-surface"><i class="fas fa-calendar-alt me-2"></i> CALENDARIO</a>
                     
                 </div>
             </div>
@@ -62,7 +65,7 @@
                     <p class="card-text small text-secondary-accent">La estrategia con Viper para asegurar el sitio A en Ascent.</p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex gap-2 p-0 pt-3">
-                    <a href="#" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Ver lineup</a>
+                    <a href="{% url 'viperlineup' %}" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Ver lineup</a>
                     <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Mas lineup de Viper</button>
                 </div>
             </div>
