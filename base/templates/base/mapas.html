@@ -1,0 +1,238 @@
+{% extends "base/menu.html" %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/agents.css' %}">
+
+{% block title %}Mapas | Lineup Angle{% endblock %}
+
+{% block content %}
+<style>
+    /* Tarjeta reutilizando estilo de agentes */
+    .agent-card-custom {
+        background-color: #182735;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+    .agent-card-custom:hover {
+        transform: translateY(-5px);
+        border-color: #FF4655;
+    }
+    .agent-img-custom {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-bottom: 3px solid #FF4655;
+    }
+    
+    /* MODAL OSCURO */
+    .modal-content-dark {
+        background-color: #182735 !important;
+        color: #f8f9fa !important;
+        border: 1px solid #FF4655;
+    }
+    .modal-header-dark {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-close-white {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    /* Tabla de callouts dentro del modal */
+    .table-callouts thead {
+        background-color: #0F1923;
+        color: #fff;
+    }
+    .table-callouts td, .table-callouts th {
+        border-color: #243447 !important;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h1 class="h4 text-light">Mapas</h1>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input id="searchInput" class="form-control"
+                   placeholder="Buscar mapa..."
+                   style="background:#182735; color:white; border:1px solid #FF4655;">
+        </div>
+    </div>
+
+    <div id="mapsGrid" class="row g-3">
+        <div class="col-12 text-center">
+            <div class="spinner-border text-danger" role="status"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL MAPA -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content modal-content-dark">
+            <div class="modal-header modal-header-dark">
+                <h5 class="modal-title" id="mapModalTitle">Nombre Mapa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="mapModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // API de MAPAS (es-MX)
+    const API_ENDPOINT = "https://valorant-api.com/v1/maps?language=es-MX";
+
+    const mapsGrid = document.getElementById('mapsGrid');
+    const searchInput = document.getElementById('searchInput');
+    let allMaps = []; // para buscador
+
+    // 1. Cargar Mapas
+    async function loadMaps() {
+        try {
+            const resp = await fetch(API_ENDPOINT);
+            const json = await resp.json();
+
+            // Puedes filtrar si quieres excluir mapas de práctica, rangos, etc.
+            allMaps = json.data.filter(m => m.displayName && m.splash);
+
+            renderMaps(allMaps);
+        } catch (err) {
+            console.error(err);
+            mapsGrid.innerHTML = `<div class="alert alert-danger">Error al cargar mapas desde la API</div>`;
+        }
+    }
+
+    // 2. Renderizar Tarjetas
+    function renderMaps(mapsList) {
+        mapsGrid.innerHTML = '';
+        if (!mapsList.length) {
+            mapsGrid.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-warning">No se encontraron mapas con ese criterio.</div>
+                </div>`;
+            return;
+        }
+
+        mapsList.forEach(map => {
+            const col = document.createElement('div');
+            col.className = 'col-sm-6 col-md-4 col-lg-3 map-col';
+
+            const description = map.narrativeDescription || map.tacticalDescription || 'Mapa de Valorant';
+
+            col.innerHTML = `
+                <div class="agent-card-custom h-100" onclick="openMapModal('${map.uuid}')">
+                    <img src="${map.splash}" class="agent-img-custom" alt="${map.displayName}">
+                    <div class="p-3">
+                        <h4 class="fw-bold" style="color: #FF4655;">
+                            ${map.displayName.toUpperCase()}
+                        </h4>
+                        <span class="badge bg-secondary">Mapa</span>
+                        <p class="small mt-2 text-muted">
+                            ${description.length > 90 ? description.substring(0, 90) + '...' : description}
+                        </p>
+                        <button class="btn btn-danger w-100 mt-2" style="background-color:#FF4655;">
+                            Ver Detalles
+                        </button>
+                    </div>
+                </div>
+            `;
+            mapsGrid.appendChild(col);
+        });
+    }
+
+    // 3. Abrir Modal de Detalle de Mapa
+    window.openMapModal = function(uuid) {
+        const map = allMaps.find(m => m.uuid === uuid);
+        if (!map) return;
+
+        document.getElementById('mapModalTitle').textContent = map.displayName.toUpperCase();
+
+        const description = map.narrativeDescription || map.tacticalDescription || 'Sin descripción detallada.';
+        const coords = map.coordinates || 'N/A';
+
+        // Callouts (zonas del mapa)
+        let calloutsHtml = '';
+        if (map.callouts && map.callouts.length) {
+            calloutsHtml = `
+                <div class="mt-3" style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-dark table-callouts align-middle">
+                        <thead>
+                            <tr>
+                                <th>Región</th>
+                                <th>Super Región</th>
+                                <th>Nombre Super Región</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${map.callouts.map(c => `
+                                <tr>
+                                    <td>${c.regionName || 'N/A'}</td>
+                                    <td>${c.superRegion || 'N/A'}</td>
+                                    <td>${c.superRegionName || 'N/A'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            calloutsHtml = `<p class="text-light mt-2">No hay callouts disponibles para este mapa.</p>`;
+        }
+
+        // Imagen grande (splash o premierBackground)
+        const bigImage = map.premierBackgroundImage || map.stylizedBackgroundImage || map.splash;
+
+        document.getElementById('mapModalBody').innerHTML = `
+            <div class="row">
+                <div class="col-md-5 text-center d-flex align-items-center justify-content-center"
+                     style="background: radial-gradient(circle, #2a2a2a 0%, #182735 70%); border-radius: 10px;">
+                    <img src="${bigImage}"
+                         style="max-height: 500px; width: 100%; object-fit: cover; border-radius: 8px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));">
+                </div>
+
+                <div class="col-md-7 mt-3 mt-md-0">
+                    <h5 class="text-light border-bottom pb-2">
+                        Información del mapa
+                    </h5>
+                    <p class="text-light mt-3">${description}</p>
+
+                    <p class="text-light mt-2">
+                        <strong style="color:#FF4655;">Coordenadas:</strong> ${coords}
+                    </p>
+
+                    <h5 class="text-light mt-4 border-bottom pb-2">
+                        Callouts / Zonas
+                    </h5>
+                    ${calloutsHtml}
+                </div>
+            </div>
+        `;
+
+        const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+        modal.show();
+    }
+
+    // 4. Buscador
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allMaps.filter(m =>
+            m.displayName && m.displayName.toLowerCase().includes(term)
+        );
+        renderMaps(filtered);
+    });
+
+    // Iniciar
+    loadMaps();
+</script>
+
+{% endblock %}

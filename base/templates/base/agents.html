@@ -1,10 +1,8 @@
 {% extends "base/menu.html" %}
 {% load static %}
-
 <link rel="stylesheet" href="{% static 'css/agents.css' %}">
 
 {% block title %}Agentes | Lineup Angle{% endblock %}
-
 {% block content %}
 <style>
     /* FORZAMOS ESTILOS AQUÍ PARA ASEGURAR QUE SE VEA BIEN */
@@ -48,6 +46,8 @@
         margin-right: 10px;
     }
 </style>
+
+{% include "base/menu2.html" %}
 
 <div class="container py-5">
     <div class="row mb-3">

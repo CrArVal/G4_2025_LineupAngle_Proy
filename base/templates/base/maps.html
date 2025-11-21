@@ -1,140 +1,324 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Mapas de Valorant</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
-    .card-img-top {
-      object-fit: contain;
-      max-height: 150px;
+{% extends "base/menu.html" %} 
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* VARIABLES DE COLOR LINEUP ANGLE */
+    :root {
+        --dark-bg: #0F1923; 
+        --secondary-color: #182735; 
+        --primary-color: #FF4655; 
+        --accent-color: #07F0F0;
+        --text-light: #f8f9fa;
+        --text-muted: #88BEC5; 
     }
-  </style>
-</head>
-<body class="bg-light">
-  <div class="container mt-4">
-    <h2 class="mb-4 text-center">Mapas de Valorant</h2>
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      {% for map in maps %}
-      <div class="col">
-        <div class="card h-100 d-flex flex-column shadow-sm">
-          <div class="card-body d-flex flex-column">
-            <!-- Imagen principal reemplazada por Splash -->
-            {% if map.splash %}
-              <li class="list-group-item">
-                
-                <img src="{{ map.splash }}" alt="Splash {{ map.displayName }}" class="img-fluid mb-3">
-              </li>
-            {% endif %}
 
-            <!-- Nombre del mapa -->
-            <h5 class="card-title">{{ map.displayName }}</h5>
+ 
 
-            <!-- Contenido desplegable -->
-            <div class="collapse mt-2" id="map-{{ map.uuid }}">
-              <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><b>UUID:</b> {{ map.uuid }}</li>
-                <li class="list-group-item"><b>Descripción táctica:</b> {{ map.tacticalDescription|default:"N/A" }}</li>
-                <li class="list-group-item"><b>Narrativa:</b> {{ map.narrativeDescription|default:"N/A" }}</li>
-                <li class="list-group-item"><b>Coordenadas:</b> {{ map.coordinates|default:"N/A" }}</li>
-                <li class="list-group-item"><b>Asset Path:</b> {{ map.assetPath }}</li>
-                <li class="list-group-item"><b>Map URL:</b> {{ map.mapUrl }}</li>
+    /* Tarjeta de Mapa */
+    .card {
+        background-color: var(--secondary-color) !important;
+        color: var(--text-light) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        cursor: pointer;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
 
-                <!-- Íconos adicionales -->
-                {% if map.listViewIcon %}
-                  <li class="list-group-item">
-                    <b>List View Icon:</b><br>
-                    <img src="{{ map.listViewIcon }}" alt="ListView {{ map.displayName }}" class="img-fluid" style="max-height:60px;">
-                  </li>
-                {% endif %}
-                {% if map.listViewIconTall %}
-                  <li class="list-group-item">
-                    <b>List View Tall:</b><br>
-                    <img src="{{ map.listViewIconTall }}" alt="ListViewTall {{ map.displayName }}" class="img-fluid" style="max-height:60px;">
-                  </li>
-                {% endif %}
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        border-color: var(--primary-color) !important; 
+    }
 
-                {% if map.stylizedBackgroundImage %}
-                  <li class="list-group-item">
-                    <b>Stylized Background:</b><br>
-                    <img src="{{ map.stylizedBackgroundImage }}" alt="Stylized {{ map.displayName }}" class="img-fluid">
-                  </li>
-                {% endif %}
-                {% if map.premierBackgroundImage %}
-                  <li class="list-group-item">
-                    <b>Premier Background:</b><br>
-                    <img src="{{ map.premierBackgroundImage }}" alt="Premier {{ map.displayName }}" class="img-fluid">
-                  </li>
-                {% endif %}
+    /* Imagen de la tarjeta (Splash ancha) */
+    .map-img {
+        width: 100%; 
+        height: 180px; 
+        object-fit: cover; 
+        border-bottom: 3px solid var(--primary-color); 
+    }
 
-                <!-- Multipliers -->
-                <li class="list-group-item"><b>xMultiplier:</b> {{ map.xMultiplier }}</li>
-                <li class="list-group-item"><b>yMultiplier:</b> {{ map.yMultiplier }}</li>
-                <li class="list-group-item"><b>xScalarToAdd:</b> {{ map.xScalarToAdd }}</li>
-                <li class="list-group-item"><b>yScalarToAdd:</b> {{ map.yScalarToAdd }}</li>
-              </ul>
+    .card-body {
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
 
-              <!-- Callouts -->
-              {% if map.callouts %}
-              <h6>Callouts</h6>
-              <div class="table-responsive">
-                <table class="table table-bordered table-sm">
-                  <thead class="table-dark">
-                    <tr>
-                      <th>Nombre Región</th>
-                      <th>Super Región</th>
-                      <th>Nombre Super Región</th>
-                      <th>Ubicación X</th>
-                      <th>Ubicación Y</th>
-                      <th>Ubicación Z</th>
-                      <th>Scale3D</th>
-                      <th>Rotación</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for callout in map.callouts %}
-                    <tr>
-                      <td>{{ callout.regionName }}</td>
-                      <td>{{ callout.superRegion }}</td>
-                      <td>{{ callout.superRegionName }}</td>
-                      <td>{{ callout.location.x|default:"N/A" }}</td>
-                      <td>{{ callout.location.y|default:"N/A" }}</td>
-                      <td>{{ callout.location.z|default:"N/A" }}</td>
-                      <td>
-                        {% if callout.scale3D %}
-                          x: {{ callout.scale3D.x }}, y: {{ callout.scale3D.y }}, z: {{ callout.scale3D.z }}
-                        {% else %}
-                          N/A
-                        {% endif %}
-                      </td>
-                      <td>
-                        {% if callout.rotation %}
-                          pitch: {{ callout.rotation.pitch }}, yaw: {{ callout.rotation.yaw }}, roll: {{ callout.rotation.roll }}
-                        {% else %}
-                          N/A
-                        {% endif %}
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-              {% endif %}
-            </div>
-          </div>
+    /* Buscador */
+    #searchInput {
+        background-color: var(--secondary-color);
+        border: 1px solid var(--primary-color);
+        color: var(--text-light);
+    }
+    #searchInput::placeholder {
+        color: var(--text-muted);
+    }
 
-          <!-- Botón al final -->
-          <div class="card-footer bg-transparent mt-auto">
-            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#map-{{ map.uuid }}" aria-expanded="false" aria-controls="map-{{ map.uuid }}">
-              Ver más
-            </button>
-          </div>
+    /* --- ESTILOS DEL MODAL --- */
+    .modal-content {
+        background-color: var(--secondary-color) !important; 
+        color: var(--text-light) !important;
+        border: 1px solid var(--primary-color) !important; 
+    }
+    .modal-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    .btn-close {
+        filter: invert(1); 
+    }
+    .modal-title {
+        color: var(--text-light) !important;
+        font-weight: bold;
+    }
 
+    /* Imagen del Minimapa en el Modal */
+    .minimap-container {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .minimap-img {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: contain;
+    }
+
+    /* Botón Ver Detalles */
+    .btn-danger {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: var(--dark-bg) !important; 
+        font-weight: bold;
+        margin-top: auto; 
+    }
+    .btn-danger:hover {
+        background-color: #e63946 !important; 
+    }
+    
+    /* Fila del grid */
+    .row.g-4 {
+        --bs-gutter-x: 1.5rem;
+        --bs-gutter-y: 1.5rem;
+    }
+</style>
+
+<div class="container pt-4"> 
+    
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="h4 text-light">MAPAS</h1>
+            <small id="lastUpdated" class="text-muted"></small>
         </div>
-      </div>
-      {% endfor %}
     </div>
-  </div>
-</body>
-</html>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input id="searchInput" class="form-control" placeholder="Buscar mapa (ej: Ascent, Bind...)" />
+        </div>
+    </div>
+
+    <div id="mapsGrid" class="row g-4">
+        <div class="col-12">
+            <div class="alert alert-info">Cargando mapas...</div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalTitle">Detalle Mapa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="mapModalBody">
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<script>
+    // API en español
+    const API_ENDPOINT = "https://valorant-api.com/v1/maps?language=es-MX"; 
+    
+    const mapsGrid = document.getElementById('mapsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const lastUpdated = document.getElementById('lastUpdated');
+    let allMaps = []; 
+
+    // LISTA NEGRA: Mapas que NO queremos mostrar
+    const excludedMaps = [
+        'The Range', 'Basic Training', 'District', 'Kasbah', 'Piazza', 'Drift', 'Glitch', 'Escaramuza B', 'Escaramuza A', 'Escaramuza C', 'LA GALERÍA', 'La Galeria' , 'Entreniamienteo basico'
+    ];
+
+    // Descripciones manuales de respaldo
+    const mapDetails = {
+        "Ascent": "Un mapa abierto con una zona central grande donde las habilidades son clave. Cuenta con puertas mecánicas indestructibles en cada sitio.",
+        "Bind": "No tiene zona central (Mid). Cuenta con dos teletransportadores unidireccionales que permiten rotaciones rápidas.",
+        "Breeze": "El mapa más grande de la rotación. Ideal para duelos a larga distancia. La zona de Mid es crucial para el control.",
+        "Fracture": "Diseño único en forma de H que permite a los atacantes presionar los sitios desde ambos lados del mapa.",
+        "Haven": "El único mapa con tres sitios de bomba (A, B, C), lo que obliga a los defensores a extenderse más.",
+        "Icebox": "Mapa vertical con tirolesas y contenedores. Los enfrentamientos suelen ser rápidos y con muchos ángulos cerrados.",
+        "Lotus": "Mapa de tres sitios con puertas giratorias y una puerta destructible. Requiere mucha coordinación.",
+        "Pearl": "Mapa submarino enfocado en la estructura tradicional de tres carriles y duelos directos.",
+        "Split": "Mapa urbano con mucha verticalidad. El control de las cuerdas en Mid es fundamental.",
+        "Sunset": "Mapa estándar de dos sitios con un énfasis fuerte en el control de Mid.",
+        "Abyss": "Mapa sin límites en los bordes, donde caer significa morir. Introduce mecánicas de riesgo alto."
+    };
+
+    // Filtrado local (Buscador)
+    searchInput?.addEventListener('input', (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        document.querySelectorAll('.map-col').forEach(col => {
+            const name = col.dataset.name || "";
+            col.style.display = name.includes(q) ? "" : "none";
+        });
+    });
+
+    // Renderizar Tarjeta
+    function renderMapCard(map) {
+        if (!map.splash || excludedMaps.includes(map.displayName)) return null;
+
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 map-col'; 
+        col.dataset.name = map.displayName.toLowerCase();
+        col.dataset.uuid = map.uuid;
+
+        const desc = map.narrativeDescription || mapDetails[map.displayName] || 'Mapa táctico de Valorant.';
+
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm">
+                <img src="${map.splash}" alt="${map.displayName}" class="map-img" loading="lazy">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h4 class="card-title fw-bold mb-1 text-white">${map.displayName.toUpperCase()}</h4>
+                    </div>
+                    
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-geo-alt-fill" style="color: var(--accent-color);"></i> 
+                        ${map.coordinates ? map.coordinates : 'Ubicación clasificada'}
+                    </p>
+
+                    <p class="card-text small text-light mb-3">
+                        ${desc.slice(0, 100) + (desc.length > 100 ? '...' : '')}
+                    </p>
+
+                    <button class="btn btn-danger w-100 view-map-btn">Ver Detalles</button>
+                </div>
+            </div>
+        `;
+        
+        col.querySelector('.view-map-btn').onclick = () => openMapModal(map.uuid);
+        
+        return col;
+    }
+
+    // Abrir Modal
+    function openMapModal(uuid) {
+        const map = allMaps.find(m => m.uuid === uuid);
+        if (!map) return;
+
+        document.getElementById('mapModalTitle').textContent = map.displayName.toUpperCase();
+        
+        const fullDesc = map.narrativeDescription || mapDetails[map.displayName] || "Información clasificada sobre este escenario de combate.";
+
+        let calloutsHtml = '';
+        if (map.callouts && map.callouts.length > 0) {
+            const regions = [...new Set(map.callouts.map(c => c.regionName))].slice(0, 8);
+            calloutsHtml = `
+                <div class="mt-4">
+                    <h6 class="text-primary mb-2">Zonas Clave:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${regions.map(r => `<span class="badge bg-secondary border border-secondary">${r}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        let tacticalInfo = '';
+        if(map.tacticalDescription) {
+            tacticalInfo = `<div class="alert mt-3 p-2" style="background: var(--secondary-color); border: 1px solid var(--accent-color); color: var(--text-light); border-radius: 5px;">
+                <strong style="color: var(--accent-color);">Estructura:</strong> ${map.tacticalDescription}
+            </div>`;
+        }
+
+        document.getElementById('mapModalBody').innerHTML = `
+            <div class="row">
+                <div class="col-lg-7 mb-3 mb-lg-0 text-center position-relative">
+                    ${map.displayIcon ? 
+                        `<h6 class="text-primary mb-2 text-center">Vista Táctica</h6>
+                         <div class="minimap-container">
+                            <img src="${map.displayIcon}" class="minimap-img" alt="Minimapa ${map.displayName}">
+                         </div>` 
+                        : '<p class="text-muted py-5 text-center">Minimapa no disponible.</p>'}
+                </div>
+
+                <div class="col-lg-5 ps-lg-4">
+                    <h5 class="text-light border-bottom pb-2 mb-3" style="border-color: var(--primary-color)!important;">Informe de Misión</h5>
+                    
+                    <p class="text-light" style="font-size: 0.95rem; line-height: 1.6;">
+                        ${fullDesc}
+                    </p>
+                    
+                    <div class="mt-3">
+                        <p class="text-muted mb-1"><strong>Coordenadas:</strong></p>
+                        <p class="text-light font-monospace small">${map.coordinates || 'Desconocidas'}</p>
+                    </div>
+
+                    ${tacticalInfo}
+                    ${calloutsHtml}
+                </div>
+            </div>
+        `;
+
+        const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+        modal.show();
+    }
+
+    // Cargar Mapas
+    async function loadMaps() {
+        try {
+            const resp = await fetch(API_ENDPOINT);
+            const json = await resp.json();
+            allMaps = json.data;
+            
+            mapsGrid.innerHTML = '';
+            let hasMaps = false;
+
+            allMaps.forEach(map => {
+                const card = renderMapCard(map);
+                if (card) {
+                    mapsGrid.appendChild(card);
+                    hasMaps = true;
+                }
+            });
+            
+            if (!hasMaps) mapsGrid.innerHTML = `<div class="col-12"><div class="alert alert-warning">No se encontraron mapas jugables.</div></div>`;
+            lastUpdated.textContent = `Actualizado: ${new Date().toLocaleDateString()}`;
+
+        } catch (err) {
+            console.error(err);
+            mapsGrid.innerHTML = `<div class="col-12"><div class="alert alert-danger">Error de conexión con la base de datos.</div></div>`;
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadMaps);
+</script>
+
+{% endblock %}

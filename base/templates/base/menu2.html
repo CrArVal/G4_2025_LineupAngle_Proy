@@ -3,9 +3,9 @@
 <link rel="stylesheet" href="{% static 'css/menu2.css' %}"> 
 
 <nav class="beginner-navbar p-1">
-    <div class="container-fluid">
+    <div class="container">
         
-        <ul class="navbar-nav mx-auto">
+        <ul class="navbar-nav">
             
             {% with request.resolver_match.url_name as active_url %}
             
@@ -18,21 +18,22 @@
             
             <li class="nav-item">
                 <a class="nav-link {% if active_url == 'agente_list' or 'rol_detail' in active_url %}active-link{% endif %}" 
-                   href="#">
+                   href="{% url 'agents_page' %}">
                    Agentes y Roles
                 </a>
             </li>
                     
             <li class="nav-item">
                 <a class="nav-link {% if active_url == 'arma_list' %}active-link{% endif %}" 
-                   href="#">
-                   Armas y Economía
+                   href="{% url 'weapons_page' %}">
+                   Armas
                 </a>
             </li>
+
             
             <li class="nav-item">
                 <a class="nav-link {% if active_url == 'mapa_list' %}active-link{% endif %}" 
-                   href="#">
+                   href="{% url 'maps_page' %}">
                    Mapas
                 </a>
             </li>
@@ -48,8 +49,6 @@
         </ul>
     </div>
 </nav>
-
-<div style="height: 100px;"></div>
 
 {% block content %}
 {% endblock %}

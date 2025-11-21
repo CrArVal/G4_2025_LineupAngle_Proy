@@ -16,4 +16,8 @@ urlpatterns = [
     path("quees/", views.quees, name="quees"),
     path("noticias/", views.noticias, name="noticias"),
     path("nosotros/", views.nosotros, name="nosotros"),
+
+    path("mapas/", views.mapas, name="mapas"),
+
+    path("menu2/", views.menu2, name="menu2")
 ]

@@ -26,3 +26,10 @@ def get_maps(language="es-ES"):
     resp = requests.get(url, params=params, timeout=10)
     resp.raise_for_status()
     return resp.json()
+
+def get_maps(language="es-ES"):
+    url = f"{BASE_URL}/mapas"
+    params = {"language": language}
+    resp = requests.get(url, params=params, timeout=10)
+    resp.raise_for_status()
+    return resp.json()

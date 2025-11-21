@@ -6,7 +6,7 @@
 .beginner-navbar {
     background-color: var(--superficie);
     margin-top: 2px; /* Ajusta a la altura de tu navbar principal */
-    position: fixed; 
+    position: static; 
     width: 100%; 
     z-index: 1020; 
     border-bottom: 2px solid var(--fondo-base);

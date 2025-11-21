@@ -66,3 +66,9 @@ def noticias(request):
 
 def nosotros(request):
     return render(request, 'base/nosotros.html')
+
+def mapas(request):
+    return render(request, 'base/mapas.html')
+
+def menu2(request):
+    return render(request, 'base/menu2.html')
