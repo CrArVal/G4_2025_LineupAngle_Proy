@@ -1,0 +1,132 @@
+{% extends 'base/menu.html' %}
+{% load static %}
+
+{% block content %}
+<div style="height: 100px;"></div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-dark text-white border-secondary shadow">
+                <div class="card-header border-secondary text-center">
+                    <h3 class="text-info fw-bold">Editar Perfil de Agente</h3>
+                    <p class="text-muted small mb-0">Actualiza tus datos de juego.</p>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label class="form-label text-info fw-bold">Riot ID</label>
+                            <input type="text" name="riot_id" class="form-control bg-secondary text-white border-0" 
+                                   value="{{ user_data.riot_id|default:'' }}" 
+                                   placeholder="Ej: Faker#KR1">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-info fw-bold">Rango Competitivo</label>
+                            <select name="rango" class="form-select bg-secondary text-white border-0">
+                                <option value="" disabled {% if not user_data.rango %}selected{% endif %}>Selecciona Rango</option>
+                                {% for rango in rangos %}
+                                    <option value="{{ rango }}" {% if user_data.rango == rango %}selected{% endif %}>
+                                        {{ rango }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <hr class="border-secondary my-4">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label text-info fw-bold">Región</label>
+                                <select name="region" id="id_region" class="form-select bg-secondary text-white border-0">
+                                    <option value="" disabled {% if not user_data.region %}selected{% endif %}>Selecciona Región</option>
+                                    {% for region in regiones %}
+                                        <option value="{{ region }}" {% if user_data.region == region %}selected{% endif %}>
+                                            {{ region }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label text-info fw-bold">Servidor Preferido</label>
+                                <select name="servidor" id="id_servidor" class="form-select bg-secondary text-white border-0">
+                                    <option value="{{ user_data.servidor|default:'' }}" selected>
+                                        {{ user_data.servidor|default:'Cargando...' }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-info fw-bold">Bio</label>
+                            <textarea name="bio" class="form-control bg-secondary text-white border-0" rows="2">{{ user_data.bio|default:'' }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-success fw-bold">GUARDAR CAMBIOS</button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-light">Cancelar</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const regionSelect = document.getElementById('id_region');
+    const serverSelect = document.getElementById('id_servidor');
+    const savedServer = "{{ user_data.servidor|default:'' }}"; 
+
+    const serversData = {
+        'NA': ['US East (N. Virginia)', 'US West (N. California)', 'US Central (Illinois)', 'US Texas', 'US West (Oregon)'],
+        'LATAM': ['Santiago', 'Mexico City', 'Miami', 'Bogota'],
+        'BR': ['Sao Paulo'],
+        'EU': ['Frankfurt', 'Paris', 'London', 'Madrid', 'Warsaw', 'Istanbul'],
+        'KR': ['Seoul'],
+        'AP': ['Tokyo', 'Singapore', 'Sydney', 'Mumbai']
+    };
+
+    function updateServers() {
+        const selectedRegion = regionSelect.value;
+        serverSelect.innerHTML = ''; 
+
+        if (selectedRegion && serversData[selectedRegion]) {
+            const defaultOption = document.createElement('option');
+            defaultOption.text = "-- Selecciona Servidor --";
+            defaultOption.value = "";
+            serverSelect.appendChild(defaultOption);
+
+            serversData[selectedRegion].forEach(server => {
+                const option = document.createElement('option');
+                option.value = server;
+                option.textContent = server;
+                if (server === savedServer) {
+                    option.selected = true;
+                }
+                serverSelect.appendChild(option);
+            });
+        } else {
+             const option = document.createElement('option');
+             option.text = savedServer || "-- Selecciona una región primero --";
+             serverSelect.appendChild(option);
+        }
+    }
+
+    regionSelect.addEventListener('change', function() {
+        serverSelect.value = ""; 
+        updateServers();
+    });
+
+    if (regionSelect.value) {
+        updateServers();
+    }
+});
+</script>
+{% endblock %}
