@@ -58,8 +58,8 @@ def maps_page(request):
         maps = []
     return render(request, "base/maps.html", {"maps": maps, "lang": lang})
 
-def quees(request):
-    return render(request, 'base/quees.html')
+def fundamentos(request):
+    return render(request, 'base/fundamentos.html')
 
 def noticias(request):
     return render(request, 'base/noticias.html')

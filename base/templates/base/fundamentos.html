@@ -1,0 +1,395 @@
+{% include "base/menu.html" %}
+{% load static %}
+{% include "base/menu2.html" %}
+
+{% block content %}
+
+<style>
+    .fundamentos-page {
+        background-color: var(--fondo-base, #050816);
+        min-height: 100vh;
+        color: var(--texto-principal, #f8f9fa);
+        padding-bottom: 4rem;
+    }
+
+    .fundamentos-page h1,
+    .fundamentos-page h2,
+    .fundamentos-page h3 {
+        color: var(--texto-principal, #f8f9fa);
+    }
+
+    .fundamentos-resumen-card {
+        background-color: var(--superficie, #0f1923);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        height: 100%;
+    }
+
+    .fundamentos-resumen-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+        border-color: var(--acento-principal, #FF4655);
+    }
+
+    .fundamentos-resumen-card .card-title {
+        font-weight: 700;
+        letter-spacing: .05rem;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .fundamentos-resumen-card .card-icon {
+        font-size: 2rem;
+        margin-bottom: .5rem;
+    }
+
+    .fundamentos-resumen-card .btn {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: .04rem;
+    }
+
+    .fundamentos-section {
+        background-color: var(--superficie, #0f1923);
+        border-radius: 16px;
+        padding: 1.8rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .fundamentos-section h3 {
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: .08rem;
+        color: var(--acento-principal, #FF4655);
+        margin-bottom: 1rem;
+    }
+
+    .fundamentos-section p,
+    .fundamentos-section li {
+        font-size: 0.9rem;
+        color: var(--texto-secundario, #c9d1d9);
+    }
+
+    .fundamentos-section kbd {
+        background-color: #111827;
+        border-radius: 4px;
+        border: 1px solid #374151;
+        padding: 2px 6px;
+        font-size: 0.75rem;
+    }
+
+    .fundamentos-section strong {
+        color: var(--texto-principal, #f8f9fa);
+    }
+
+    /* Separador pequeño bajo el título */
+    .fundamentos-divider {
+        width: 80px;
+        height: 3px;
+        border-radius: 999px;
+        margin: 0.5rem auto 0;
+        background: linear-gradient(90deg, #FF4655, #f97316);
+    }
+
+    @media (max-width: 768px) {
+        .fundamentos-section {
+            padding: 1.2rem;
+        }
+    }
+    /* Forzar texto claro en las cards */
+    .fundamentos-resumen-card .card-title,
+    .fundamentos-resumen-card .card-text {
+    color: #fff !important;
+}
+</style>
+
+<main class="fundamentos-page py-5">
+    <div class="container">
+
+        <!-- TÍTULO PRINCIPAL -->
+        <section class="text-center mb-5">
+            <h1 class="text-center fw-bold mb-5" style="color:#FF4655;">FUNDAMENTOS</h1>
+            <p class="mt-3 mx-auto" style="max-width: 700px;">
+                Esta guía está pensada para jugadores principiantes que quieren entender
+                lo básico de Valorant: cómo se juega una partida, qué botones usar,
+                cómo plantar la Spike, cuánto daño puedes aguantar y cuándo termina la partida.
+            </p>
+        </section>
+
+        <!-- CARDS RESUMEN (ATALLOS A CADA SECCIÓN) -->
+        <section>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card fundamentos-resumen-card">
+                        <div class="card-body">
+                            <div class="card-icon">🎮</div>
+                            <h5 class="card-title">¿Cómo se juega?</h5>
+                            <p class="card-text">
+                                Aprende la idea general: atacantes vs defensores, plantar o defender la Spike
+                                y cómo se gana una ronda.
+                            </p>
+                            <a href="#flujo-partida" class="btn btn-outline-light btn-sm mt-2">
+                                Ver flujo de partida
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card fundamentos-resumen-card">
+                        <div class="card-body">
+                            <div class="card-icon">⌨️</div>
+                            <h5 class="card-title">Controles Básicos</h5>
+                            <p class="card-text">
+                                Movimiento, disparo, agacharse, caminar en silencio y cómo usar tus habilidades.
+                            </p>
+                            <a href="#controles-basicos" class="btn btn-outline-light btn-sm mt-2">
+                                Ver controles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card fundamentos-resumen-card">
+                        <div class="card-body">
+                            <div class="card-icon">💣</div>
+                            <h5 class="card-title">Spike y Objetivo</h5>
+                            <p class="card-text">
+                                Cómo plantar la bomba, cómo desactivarla y qué pasa si explota o la desactivan.
+                            </p>
+                            <a href="#spike-objetivo" class="btn btn-outline-light btn-sm mt-2">
+                                Ver objetivo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card fundamentos-resumen-card">
+                        <div class="card-body">
+                            <div class="card-icon">❤️</div>
+                            <h5 class="card-title">Vida y Escudos</h5>
+                            <p class="card-text">
+                                Dónde ver tu vida, cómo funcionan los escudos y por qué es importante comprarlos.
+                            </p>
+                            <a href="#vida-escudos" class="btn btn-outline-light btn-sm mt-2">
+                                Ver vida y escudos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card fundamentos-resumen-card">
+                        <div class="card-body">
+                            <div class="card-icon">🔫</div>
+                            <h5 class="card-title">Disparo y armas</h5>
+                            <p class="card-text">
+                                Cómo disparar mejor, diferencia entre clic izquierdo y derecho y tipos de armas.
+                            </p>
+                            <a href="#disparo-armas" class="btn btn-outline-light btn-sm mt-2">
+                                Ver disparo y armas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card fundamentos-resumen-card">
+                        <div class="card-body">
+                            <div class="card-icon">🧮</div>
+                            <h5 class="card-title">Rondas y economía</h5>
+                            <p class="card-text">
+                                Cuántas rondas se juegan, cuándo termina la partida y cómo administrar tu dinero.
+                            </p>
+                            <a href="#rondas-economia" class="btn btn-outline-light btn-sm mt-2">
+                                Ver rondas y economía
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIONES DETALLADAS -->
+
+        <!-- 1. FLUJO DE PARTIDA -->
+        <section id="flujo-partida" class="fundamentos-section">
+            <h3>¿Cómo se juega una partida?</h3>
+            <p>
+                Valorant es un juego 5 vs 5 por rondas. Hay dos equipos:
+                <strong>Atacantes</strong> y <strong>Defensores</strong>. El objetivo cambia según el lado:
+            </p>
+            <ul>
+                <li>
+                    <strong>Atacantes:</strong> deben plantar la <strong>Spike</strong> (bomba) en uno de los sitios (A, B, etc.)
+                    y defenderla hasta que explote, o eliminar a todo el equipo enemigo.
+                </li>
+                <li>
+                    <strong>Defensores:</strong> deben evitar que planten la Spike, o si ya está plantada, desactivarla
+                    antes de que explote, o eliminar a todo el equipo atacante.
+                </li>
+            </ul>
+            <p>
+                Cada partida se divide en <strong>rondas</strong>. En cada ronda tienes una sola vida:
+                si mueres, esperas a la siguiente ronda.
+            </p>
+        </section>
+
+        <!-- 2. CONTROLES BÁSICOS -->
+        <section id="controles-basicos" class="fundamentos-section">
+            <h3>Controles básicos (teclado y ratón)</h3>
+            <p>
+                Por defecto (en PC) los controles básicos son:
+            </p>
+            <ul>
+                <li>
+                    <strong>Movimiento:</strong> 
+                    <kbd>W</kbd> (adelante), <kbd>A</kbd> (izquierda), <kbd>S</kbd> (atrás), <kbd>D</kbd> (derecha)
+                </li>
+                <li>
+                    <strong>Saltar:</strong> <kbd>Espacio</kbd>
+                </li>
+                <li>
+                    <strong>Agacharse:</strong> <kbd>Ctrl</kbd> (o <kbd>Shift Izq</kbd>, dependiendo de tu configuración)
+                </li>
+                <li>
+                    <strong>Caminar en silencio:</strong> mantén presionado <kbd>Shift</kbd> para hacer menos ruido.
+                </li>
+                <li>
+                    <strong>Disparar:</strong> clic izquierdo del ratón.
+                </li>
+                <li>
+                    <strong>Modo alternativo de disparo (zoom o ráfaga):</strong> clic derecho del ratón
+                    (depende del arma).
+                </li>
+                <li>
+                    <strong>Arma principal / secundaria / melee:</strong> <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>.
+                </li>
+                <li>
+                    <strong>Habilidades:</strong> <kbd>Q</kbd>, <kbd>E</kbd>, <kbd>C</kbd> y <kbd>X</kbd> (definitiva).
+                </li>
+                <li>
+                    <strong>Comprar armas y habilidades (fase de compra):</strong> <kbd>B</kbd>.
+                </li>
+            </ul>
+            <p>
+                Siempre puedes cambiar estas teclas en el menú de opciones de Valorant
+                si te acomoda otra configuración.
+            </p>
+        </section>
+
+        <!-- 3. SPIKE Y OBJETIVO -->
+        <section id="spike-objetivo" class="fundamentos-section">
+            <h3>Spike: plantar y desactivar</h3>
+            <p>
+                La <strong>Spike</strong> es la bomba que llevan los atacantes. Cada ronda solo un jugador
+                la tiene al inicio (verás un ícono cerca de tu minimapa si tú la llevas).
+            </p>
+            <ul>
+                <li>
+                    Para <strong>plantar la Spike</strong>, debes:
+                    <ul>
+                        <li>Estar en un sitio válido (zona marcada dentro del punto A, B, etc.).</li>
+                        <li>Equipar la Spike (generalmente en la tecla <kbd>4</kbd>).</li>
+                        <li>Mantener presionado el botón de acción (por defecto, clic izquierdo) mientras se llena la barra.</li>
+                    </ul>
+                </li>
+                <li>
+                    Para <strong>desactivar la Spike</strong> (si eres defensor):
+                    <ul>
+                        <li>Acerarte a la Spike plantada.</li>
+                        <li>Mantener presionada la tecla de interacción (por defecto <kbd>E</kbd>) hasta completar la barra.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>
+                Si la Spike explota, ganan los atacantes. Si la desactivan a tiempo, ganan los defensores.
+            </p>
+        </section>
+
+        <!-- 4. VIDA Y ESCUDOS -->
+        <section id="vida-escudos" class="fundamentos-section">
+            <h3>¿Cuánta vida tengo? Vida y escudos</h3>
+            <p>
+                Tu vida se muestra normalmente en la parte inferior de la pantalla:
+                tienes <strong>100 puntos de vida</strong> base. Además, puedes comprar escudos.
+            </p>
+            <ul>
+                <li><strong>Sin escudo:</strong> 100 de vida.</li>
+                <li><strong>Escudo ligero:</strong> vida + escudo (por ejemplo, hasta 125).</li>
+                <li><strong>Escudo pesado:</strong> vida + escudo (por ejemplo, hasta 150).</li>
+            </ul>
+            <p>
+                El escudo absorbe parte del daño recibido, por eso es muy importante comprarlo
+                en rondas clave. Si mueres, reapareces con 100 de vida en la siguiente ronda y
+                debes volver a comprar escudos.
+            </p>
+        </section>
+
+        <!-- 5. DISPARO Y ARMAS -->
+        <section id="disparo-armas" class="fundamentos-section">
+            <h3>Disparo y tipos de armas</h3>
+            <p>
+                Lo más importante en Valorant es el <strong>control del disparo</strong>:
+            </p>
+            <ul>
+                <li>
+                    Disparar <strong>corriendo</strong> es muy impreciso. Lo ideal es dejar de moverte
+                    un momento (o caminar muy lento) para que las balas vayan donde apuntas.
+                </li>
+                <li>
+                    Usa ráfagas cortas (2–3 balas) en lugar de dejar el clic presionado,
+                    especialmente con rifles.
+                </li>
+                <li>
+                    El <strong>clic derecho</strong> en algunas armas activa un modo de disparo alternativo:
+                    zoom en rifles como Vandal/Phantom, o disparo en ráfaga en otras armas.
+                </li>
+            </ul>
+            <p>Algunos tipos de armas que encontrarás:</p>
+            <ul>
+                <li><strong>Pistolas:</strong> baratas, para rondas iniciales o eco.</li>
+                <li><strong>SMG / escopetas:</strong> buenas a corta distancia.</li>
+                <li><strong>Rifles:</strong> Vandal, Phantom (meta principal, eficaces a media/larga distancia).</li>
+                <li><strong>Francotiradores:</strong> como Operator, para picks a larga distancia.</li>
+            </ul>
+        </section>
+
+        <!-- 6. RONDAS Y ECONOMÍA -->
+        <section id="rondas-economia" class="fundamentos-section">
+            <h3>Rondas, dinero y cuándo termina la partida</h3>
+            <p>
+                En los modos competitivos/clasificatoria y no competitiva estándar,
+                se juega al mejor de varias rondas (por ejemplo, el primer equipo que llega a
+                <strong>13 rondas ganadas</strong> suele llevarse la victoria, con cambio de lado a mitad de partida).
+            </p>
+            <p>
+                Cada ronda ganas dinero según:
+            </p>
+            <ul>
+                <li>Si ganas la ronda, recibes más créditos.</li>
+                <li>Si pierdes, recibes menos, pero el juego suele darte un “bono por racha de derrotas”.</li>
+                <li>También obtienes créditos por plantar la Spike o matar enemigos.</li>
+            </ul>
+            <p>
+                Con esos créditos compras:
+            </p>
+            <ul>
+                <li>Armas (rifles, pistolas, etc.).</li>
+                <li>Escudos (ligero o pesado).</li>
+                <li>Habilidades de tu agente.</li>
+            </ul>
+            <p>
+                Aprender a <strong>administrar tu economía</strong> (saber cuándo gastar mucho y cuándo guardar)
+                es una parte clave para ganar partidas.
+            </p>
+        </section>
+
+    </div>
+</main>
+
+{% endblock %}

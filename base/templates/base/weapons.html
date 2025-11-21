@@ -1,115 +1,282 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Armas de Valorant</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
-    .card-img-top {
-      object-fit: contain;
-      max-height: 150px;
+{% extends "base/menu.html" %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/agents.css' %}"> {% block title %}Armas y Economía | Lineup Angle{% endblock %}
+{% block content %}
+<style>
+    /* ESTILOS COHERENTES CON LA PLANTILLA DE AGENTES */
+    body {
+        background-color: #0F1923 !important; /* Fondo Oscuro de VALORANT */
+        color: #f8f9fa; /* Texto claro */
     }
-  </style>
-</head>
-<body class="bg-light">
-  <div class="container mt-4">
-    <h2 class="mb-4 text-center">Armas de Valorant</h2>
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      {% for weapon in weapons %}
-      <div class="col">
-        <div class="card h-100 d-flex flex-column shadow-sm">
-          <div class="card-body d-flex flex-column">
-            <!-- Imagen -->
-            {% if weapon.displayIcon %}
-              <img src="{{ weapon.displayIcon }}" alt="{{ weapon.displayName }}" class="card-img-top mb-3">
-            {% endif %}
 
-            <!-- Nombre -->
-            <h5 class="card-title">{{ weapon.displayName }}</h5>
+    .weapon-card-custom {
+        background-color: #182735;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s;
+        cursor: pointer;
+        min-height: 250px; /* Para mantener la altura similar a Agentes */
+    }
+    .weapon-card-custom:hover {
+        transform: translateY(-5px);
+        border-color: #FF4655;
+    }
 
-            <!-- Contenido desplegable -->
-            <div class="collapse mt-2" id="weapon-{{ weapon.uuid }}">
-              <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><b>UUID:</b> {{ weapon.uuid }}</li>
-                <li class="list-group-item"><b>Categoría:</b> {{ weapon.category }}</li>
-                <li class="list-group-item"><b>Skin por defecto:</b> {{ weapon.defaultSkinUuid }}</li>
-                <li class="list-group-item"><b>Asset Path:</b> {{ weapon.assetPath }}</li>
-                {% if weapon.killStreamIcon %}
-                <li class="list-group-item">
-                  <b>Kill Stream Icon:</b><br>
-                  <img src="{{ weapon.killStreamIcon }}" alt="KillStream {{ weapon.displayName }}" class="img-fluid" style="max-height:60px;">
-                </li>
-                {% endif %}
-              </ul>
+    .weapon-img-custom {
+        width: 100%;
+        height: 120px;
+        object-fit: contain; /* Para que el arma se vea completa */
+        border-bottom: 3px solid #FF4655;
+        padding: 10px;
+        background-color: #0F1923; /* Fondo negro para resaltar la imagen */
+    }
 
-              {% if weapon.weaponStats %}
-              <h6>Estadísticas</h6>
-              <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><b>Cadencia de fuego:</b> {{ weapon.weaponStats.fireRate }}</li>
-                <li class="list-group-item"><b>Tamaño cargador:</b> {{ weapon.weaponStats.magazineSize }}</li>
-                <li class="list-group-item"><b>Velocidad al correr:</b> {{ weapon.weaponStats.runSpeedMultiplier }}</li>
-                <li class="list-group-item"><b>Tiempo de equipar:</b> {{ weapon.weaponStats.equipTimeSeconds }} s</li>
-                <li class="list-group-item"><b>Tiempo de recarga:</b> {{ weapon.weaponStats.reloadTimeSeconds }} s</li>
-                <li class="list-group-item"><b>Precisión primer disparo:</b> {{ weapon.weaponStats.firstBulletAccuracy }}</li>
-                <li class="list-group-item"><b>Balas por tiro (escopeta):</b> {{ weapon.weaponStats.shotgunPelletCount }}</li>
-                <li class="list-group-item"><b>Penetración:</b> {{ weapon.weaponStats.wallPenetration }}</li>
-                <li class="list-group-item"><b>Feature:</b> {{ weapon.weaponStats.feature }}</li>
-                <li class="list-group-item"><b>Modo de fuego:</b> {{ weapon.weaponStats.fireMode|default:"N/A" }}</li>
-                <li class="list-group-item"><b>Disparo alternativo:</b> {{ weapon.weaponStats.altFireType|default:"N/A" }}</li>
-              </ul>
-              {% endif %}
+    /* ESTILOS DEL MODAL OSCURO (Reutilizados de Agentes) */
+    .modal-content-dark {
+        background-color: #182735 !important;
+        color: #f8f9fa !important;
+        border: 1px solid #FF4655;
+    }
+    .modal-header-dark {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-close-white {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
 
-              {% if weapon.weaponStats.adsStats %}
-              <h6>Estadísticas ADS</h6>
-              <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><b>Zoom:</b> {{ weapon.weaponStats.adsStats.zoomMultiplier }}</li>
-                <li class="list-group-item"><b>Cadencia:</b> {{ weapon.weaponStats.adsStats.fireRate }}</li>
-                <li class="list-group-item"><b>Velocidad al correr:</b> {{ weapon.weaponStats.adsStats.runSpeedMultiplier }}</li>
-                <li class="list-group-item"><b>Balas por ráfaga:</b> {{ weapon.weaponStats.adsStats.burstCount }}</li>
-                <li class="list-group-item"><b>Precisión primer disparo:</b> {{ weapon.weaponStats.adsStats.firstBulletAccuracy }}</li>
-              </ul>
-              {% endif %}
+    /* Estilos específicos de las estadísticas en el modal */
+    .stat-group {
+        background: #0F1923;
+        padding: 10px;
+        border-radius: 5px;
+        border-left: 3px solid #FF4655;
+        margin-bottom: 15px;
+    }
 
-              {% if weapon.weaponStats.damageRanges %}
-              <h6>Daño por rango</h6>
-              <div class="table-responsive">
-                <table class="table table-bordered table-sm">
-                  <thead class="table-dark">
-                    <tr>
-                      <th>Desde (m)</th>
-                      <th>Hasta (m)</th>
-                      <th>Head</th>
-                      <th>Body</th>
-                      <th>Leg</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for dmg in weapon.weaponStats.damageRanges %}
-                    <tr>
-                      <td>{{ dmg.rangeStartMeters }}</td>
-                      <td>{{ dmg.rangeEndMeters }}</td>
-                      <td>{{ dmg.headDamage }}</td>
-                      <td>{{ dmg.bodyDamage }}</td>
-                      <td>{{ dmg.legDamage }}</td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-              {% endif %}
-            </div>
-          </div>
-          <!-- Botón al final -->
-          <div class="card-footer bg-transparent mt-auto">
-            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#weapon-{{ weapon.uuid }}" aria-expanded="false" aria-controls="weapon-{{ weapon.uuid }}">
-              Ver más
-            </button>
-          </div>
+    .damage-table th, .damage-table td {
+        color: #f8f9fa;
+        background-color: #0F1923;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .damage-table thead th {
+        background-color: #FF4655;
+        color: black;
+    }
+</style>
+
+{% include "base/menu2.html" %}
+
+<div class="container py-5">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h1 class="text-center fw-bold mb-5" style="color:#FF4655;">ARMA Y ECONOMIA</h1>
+            <p class="text-center">Análisis detallado de todas las armas, sus estadísticas y daño por rango.</p>
         </div>
-      </div>
-      {% endfor %}
     </div>
-  </div>
-</body>
-</html>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input id="searchInput" class="form-control" placeholder="Buscar arma (Vandal, Ghost, Judge...)" style="background:#182735; color:white; border:1px solid #FF4655;">
+        </div>
+    </div>
+
+    <div id="weaponsGrid" class="row g-3">
+        <div class="col-12 text-center">
+            <div class="spinner-border text-danger" role="status"></div>
+            <p class="text-muted mt-2">Cargando arsenal...</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="weaponModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content modal-content-dark">
+            <div class="modal-header modal-header-dark">
+                <h5 class="modal-title" id="weaponModalTitle">Nombre Arma</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="weaponModalBody">
+                </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // La API de VALORANT para armas
+    const API_ENDPOINT = "https://valorant-api.com/v1/weapons?language=es-MX";
+
+    const weaponsGrid = document.getElementById('weaponsGrid');
+    const searchInput = document.getElementById('searchInput');
+    let allWeapons = [];
+
+    // Función para formatear el costo del arma
+    function formatCost(cost) {
+        return cost > 0 ? `Coste: ${cost} ¢` : 'Gratis';
+    }
+
+    // 1. Cargar Armas desde la API
+    async function loadWeapons() {
+        try {
+            const resp = await fetch(API_ENDPOINT);
+            const json = await resp.json();
+
+            // Filtramos las armas principales y eliminamos el cuchillo/cuerpo a cuerpo que no tiene stats útiles
+            allWeapons = json.data.filter(weapon => 
+                weapon.weaponStats && weapon.displayName.toLowerCase() !== 'cuerpo a cuerpo'
+            );
+
+            renderWeapons(allWeapons);
+
+        } catch (err) {
+            console.error(err);
+            weaponsGrid.innerHTML = `<div class="alert alert-danger" style="background:#FF4655; color:black;">Error al cargar API de Armas.</div>`;
+        }
+    }
+
+    // 2. Renderizar Tarjetas
+    function renderWeapons(weaponsList) {
+        weaponsGrid.innerHTML = '';
+        if (weaponsList.length === 0) {
+            weaponsGrid.innerHTML = `<div class="col-12 text-center"><p class="text-muted">No se encontraron armas con ese nombre.</p></div>`;
+            return;
+        }
+
+        weaponsList.forEach(weapon => {
+            const cost = weapon.shopData ? weapon.shopData.cost : 0;
+            const category = weapon.shopData ? weapon.shopData.categoryText : 'Utilidad';
+
+            const col = document.createElement('div');
+            col.className = 'col-sm-6 col-md-4 col-lg-3 weapon-col';
+
+            // HTML de la Tarjeta (Similar a Agentes)
+            col.innerHTML = `
+                <div class="weapon-card-custom h-100" onclick="openWeaponModal('${weapon.uuid}')">
+                    <img src="${weapon.displayIcon}" class="weapon-img-custom" alt="${weapon.displayName}">
+                    <div class="p-3">
+                        <h4 class="fw-bold" style="color: #FF4655;">${weapon.displayName.toUpperCase()}</h4>
+                        <span class="badge bg-secondary">${category}</span>
+                        <p class="small mt-2 text-muted">${formatCost(cost)}</p>
+                        <button class="btn btn-danger w-100 mt-2" style="background-color:#FF4655;">Ver Estadísticas</button>
+                    </div>
+                </div>
+            `;
+            weaponsGrid.appendChild(col);
+        });
+    }
+
+    // 3. Abrir Modal de Detalle (Adaptado para Armas)
+    window.openWeaponModal = function(uuid) {
+        const weapon = allWeapons.find(w => w.uuid === uuid);
+        if (!weapon) return;
+
+        // Título del Modal
+        document.getElementById('weaponModalTitle').textContent = weapon.displayName.toUpperCase();
+
+        // -------------------------
+        // A. HTML de Estadísticas Básicas
+        // -------------------------
+        const stats = weapon.weaponStats;
+        let statsHtml = '';
+        if (stats) {
+            statsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stat-group">
+                            <strong style="color: #FF4655;">Cadencia de Fuego:</strong> ${stats.fireRate} r/s
+                        </div>
+                        <div class="stat-group">
+                            <strong style="color: #FF4655;">Precisión Primer Disparo:</strong> ${Math.round(stats.firstBulletAccuracy * 100)}%
+                        </div>
+                         <div class="stat-group">
+                            <strong style="color: #FF4655;">Penetración de Muro:</strong> ${stats.wallPenetration}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-group">
+                            <strong style="color: #FF4655;">Tamaño de Cargador:</strong> ${stats.magazineSize} balas
+                        </div>
+                        <div class="stat-group">
+                            <strong style="color: #FF4655;">Tiempo de Recarga:</strong> ${stats.reloadTimeSeconds} s
+                        </div>
+                        <div class="stat-group">
+                            <strong style="color: #FF4655;">Costo:</strong> ${weapon.shopData ? formatCost(weapon.shopData.cost) : 'N/A'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // -------------------------
+        // B. HTML de Daño por Rango (Tabla)
+        // -------------------------
+        let damageTableHtml = '';
+        if (stats && stats.damageRanges) {
+            let tbody = stats.damageRanges.map(dmg => `
+                <tr>
+                    <td>${dmg.rangeStartMeters} m</td>
+                    <td>${dmg.rangeEndMeters} m</td>
+                    <td>${dmg.headDamage}</td>
+                    <td>${dmg.bodyDamage}</td>
+                    <td>${dmg.legDamage}</td>
+                </tr>
+            `).join('');
+
+            damageTableHtml = `
+                <h5 class="text-light mt-4 border-bottom pb-2" style="color:#FF4655 !important;">Daño por Distancia</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm damage-table">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th>Cabeza</th>
+                                <th>Cuerpo</th>
+                                <th>Pierna</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tbody}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // -------------------------
+        // C. Cuerpo Completo del Modal (Diseño de 2 columnas)
+        // -------------------------
+        document.getElementById('weaponModalBody').innerHTML = `
+            <div class="row">
+                <div class="col-md-4 text-center d-flex align-items-center justify-content-center" style="background: radial-gradient(circle, #2a2a2a 0%, #182735 70%); border-radius: 10px;">
+                    <img src="${weapon.displayIcon}" style="max-height: 250px; width: auto; max-width: 100%; filter: drop-shadow(0 0 10px rgba(255, 70, 85, 0.5));">
+                </div>
+
+                <div class="col-md-8 mt-3 mt-md-0">
+                    <h5 class="text-light border-bottom pb-2">Categoría: <span style="color:#FF4655">${weapon.shopData ? weapon.shopData.categoryText : 'Especial'}</span></h5>
+                    
+                    <h5 class="text-light mt-4 border-bottom pb-2">Estadísticas Clave</h5>
+                    ${statsHtml}
+                    
+                    ${damageTableHtml}
+
+                    <p class="small text-muted mt-3">Ruta del Asset: ${weapon.assetPath}</p>
+                </div>
+            </div>
+        `;
+
+        const modal = new bootstrap.Modal(document.getElementById('weaponModal'));
+        modal.show();
+    }
+
+    // 4. Buscador (Similar a Agentes)
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allWeapons.filter(w => w.displayName.toLowerCase().includes(term));
+        renderWeapons(filtered);
+    });
+
+    // Iniciar
+    loadWeapons();
+</script>
+
+{% endblock %}

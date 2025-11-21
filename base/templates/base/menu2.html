@@ -11,7 +11,7 @@
             
             <li class="nav-item">
                 <a class="nav-link {% if active_url == 'home' %}active-link{% endif %}" 
-                   href="#">
+                   href="{% url 'fundamentos' %}">
                    Fundamentos
                 </a>
             </li>
@@ -40,7 +40,7 @@
             
             <li class="nav-item">
                 <a class="nav-link {% if active_url == 'glosario_list' %}active-link{% endif %}" 
-                   href="#">
+                   href="{% url 'lenguajev' %}">
                    Glosario
                 </a>
             </li>
