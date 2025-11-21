@@ -72,3 +72,5 @@ def mapas(request):
 
 def menu2(request):
     return render(request, 'base/menu2.html')
+def lenguaje(request):
+    return render(request, 'base/lenguaje.html')

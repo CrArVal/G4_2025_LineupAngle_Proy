@@ -19,5 +19,6 @@ urlpatterns = [
 
     path("mapas/", views.mapas, name="mapas"),
 
-    path("menu2/", views.menu2, name="menu2")
+    path("menu2/", views.menu2, name="menu2"),
+    path("lenguaje/", views.lenguaje, name="lenguajev")
 ]

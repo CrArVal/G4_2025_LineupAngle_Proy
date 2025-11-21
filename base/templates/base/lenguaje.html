@@ -1,0 +1,391 @@
+{% extends "base/menu.html" %}
+{% load static %}
+
+
+
+{% block content %}
+<style>
+    /* VARIABLES (Asumimos que están en el CSS global) */
+    :root {
+        --dark-bg: #0F1923; 
+        --secondary-color: #182735; 
+        --primary-color: #FF4655; 
+        --accent-color: #07F0F0;
+        --text-light: #f8f9fa;
+        --text-muted: #88BEC5; 
+    }
+
+    body {
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+    }
+    
+    /* Estilos de la Tarjeta del Glosario */
+    .term-card {
+        background-color: var(--secondary-color);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        transition: box-shadow 0.2s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .term-card:hover {
+        box-shadow: 0 0 15px rgba(255, 70, 85, 0.2);
+    }
+
+    .term-title {
+        color: var(--primary-color);
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .term-category {
+        font-size: 0.85rem;
+        color: var(--accent-color);
+        margin-bottom: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .term-definition {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+
+    /* Barra de Búsqueda */
+    #searchInput {
+        background-color: var(--secondary-color);
+        border: 1px solid var(--primary-color);
+        color: var(--text-light);
+    }
+</style>
+
+<div class="container py-5" style="margin-top: 50px;">
+    <h1 class="text-center fw-bold mb-5" style="color: var(--primary-color);">GLOSARIO TÁCTICO</h1>
+    <p class="lead text-center text mb-4">Aprende la jerga de VALORANT. Domina los términos tácticos usados en el juego competitivo.</p>
+    
+    <div class="row mb-5 justify-content-center">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar término (ej: Molly, Flank, Hookah...)" />
+        </div>
+    </div>
+
+    <div class="row g-4" id="glossaryGrid">
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Default Táctica Lenta">
+            <div class="term-card">
+                <h4 class="term-title">DEFAULT</h4>
+                <p class="term-category">TÁCTICA</p>
+                <p class="term-definition">
+                    Estrategia de ataque lenta y controlada. El equipo avanza para controlar áreas clave (Mid, entradas de sitio) sin ejecutar el *push* principal.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Entry Fragger duelista">
+            <div class="term-card">
+                <h4 class="term-title">ENTRY FRAGGER</h4>
+                <p class="term-category">ROL</p>
+                <p class="term-definition">
+                    El duelista o jugador cuya misión es entrar primero al sitio, tomar el primer *kill* y crear espacio para el equipo.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Post Plant defensa">
+            <div class="term-card">
+                <h4 class="term-title">POST-PLANT</h4>
+                <p class="term-category">ESTRATEGIA</p>
+                <p class="term-definition">
+                    Fase del juego que comienza tras plantar la Spike. El equipo se posiciona para defender y usar *lineups* para negar el *defuse*.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Lurker Flanqueo">
+            <div class="term-card">
+                <h4 class="term-title">LURKER</h4>
+                <p class="term-category">ROL</p>
+                <p class="term-definition">
+                    Jugador que se mueve en solitario por el lado opuesto del mapa al ataque principal, buscando *kills* por la espalda o información del flanco. (Usualmente Omen/Viper).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Execute Ejecución">
+            <div class="term-card">
+                <h4 class="term-title">EXECUTE</h4>
+                <p class="term-category">TÁCTICA</p>
+                <p class="term-definition">
+                    Asalto rápido y coordinado a un sitio de bomba, utilizando toda la *utilidad* (humos, *flashes*) al mismo tiempo para anular la defensa y asegurar el *plant*.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Retake Retomar">
+            <div class="term-card">
+                <h4 class="term-title">RETAKE</h4>
+                <p class="term-category">COMBATE</p>
+                <p class="term-definition">
+                    El acto de retomar un sitio de bomba que ha sido capturado por el equipo enemigo. Requiere la reagrupación del equipo y el uso coordinado de Ultimates.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Fast Rush">
+            <div class="term-card">
+                <h4 class="term-title">FAST RUSH / BINARIO</h4>
+                <p class="term-category">TÁCTICA</p>
+                <p class="term-definition">
+                    Ataque frontal rápido sin control de mapa previo, buscando abrumar la defensa con número antes de que puedan rotar.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Anti-Eco">
+            <div class="term-card">
+                <h4 class="term-title">ANTI-ECO</h4>
+                <p class="term-category">ECONOMÍA</p>
+                <p class="term-definition">
+                    Estrategia para una ronda en la que el enemigo está con poco dinero. Se compran armas intermedias (Spectre/Bulldog) y *utilidad* ligera para no perder dinero.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Hookah Bind Teleporter">
+            <div class="term-card">
+                <h4 class="term-title">HOOKAH</h4>
+                <p class="term-category">MAPA/CALLOUT</p>
+                <p class="term-definition">
+                    Área que conduce directamente al Sitio B de Bind. Es clave para el *entry* y rotaciones por el portal B.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Heaven Ascent">
+            <div class="term-card">
+                <h4 class="term-title">HEAVEN / PARAÍSO</h4>
+                <p class="term-category">MAPA/CALLOUT</p>
+                <p class="term-definition">
+                    Zona elevada con vista al sitio de bomba (ej. B Heaven en Ascent). Usualmente un punto de defensa fuerte.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Catwalk Mid">
+            <div class="term-card">
+                <h4 class="term-title">CATWALK / PASARELA</h4>
+                <p class="term-category">MAPA/CALLOUT</p>
+                <p class="term-definition">
+                    Pasarela larga y angosta que conecta diferentes áreas, común en Mid o cerca de los sitios.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Link / Connector">
+            <div class="term-card">
+                <h4 class="term-title">LINK / CONECTOR</h4>
+                <p class="term-category">MAPA/CALLOUT</p>
+                <p class="term-definition">
+                    Pasaje o corredor que conecta directamente dos áreas mayores, como Mid y un Sitio (ej. A Link en Ascent).
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Spawn Barrier">
+            <div class="term-card">
+                <h4 class="term-title">BARRERA DE SPAWN</h4>
+                <p class="term-category">MECÁNICA</p>
+                <p class="term-definition">
+                    La barrera invisible que se desactiva al inicio de la ronda y que impide a los agentes abandonar la base antes de los 70 segundos.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Orb">
+            <div class="term-card">
+                <h4 class="term-title">ORB / ESFERA</h4>
+                <p class="term-category">ECONOMÍA/MECÁNICA</p>
+                <p class="term-definition">
+                    Esfera de Ultimate que se encuentra en el mapa. Recogerla otorga un punto de Ultimate (X).
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Deep Flank">
+            <div class="term-card">
+                <h4 class="term-title">FLANQUEO PROFUNDO</h4>
+                <p class="term-category">MOVIMIENTO</p>
+                <p class="term-definition">
+                    Flanquear tardíamente, asegurando que el equipo enemigo ya esté ejecutando su ataque para entrar por su retaguardia y cortar rotaciones.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Stackear">
+            <div class="term-card">
+                <h4 class="term-title">STACKEAR</h4>
+                <p class="term-category">DEFENSA</p>
+                <p class="term-definition">
+                    Concentrar a la mayoría del equipo (4 o 5 jugadores) en un solo sitio de bomba para asegurar la defensa o hacer una ejecución rápida.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Ultimate">
+            <div class="term-card">
+                <h4 class="term-title">ULTIMATE / ULTI</h4>
+                <p class="term-category">HABILIDAD</p>
+                <p class="term-definition">
+                    La habilidad más poderosa de un agente, que requiere puntos (Ultimate Points) para ser usada. Se activa con la tecla X.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Initiator">
+            <div class="term-card">
+                <h4 class="term-title">INICIADOR</h4>
+                <p class="term-category">ROL</p>
+                <p class="term-definition">
+                    Agente encargado de recopilar información (*info*) y limpiar ángulos para que el Duelista pueda entrar (ej. Sova, KAY/O, Fade).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Controller">
+            <div class="term-card">
+                <h4 class="term-title">CONTROLADOR</h4>
+                <p class="term-category">ROL</p>
+                <p class="term-definition">
+                    Agente que usa humos y muros para cortar la línea de visión del enemigo y negar áreas (ej. Omen, Viper, Brimstone).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Sentinel">
+            <div class="term-card">
+                <h4 class="term-title">SENTINELA / VIGILANTE</h4>
+                <p class="term-category">ROL</p>
+                <p class="term-definition">
+                    Agente encargado de asegurar los flancos y defender los sitios de forma pasiva mediante trampas y *utilidad* (ej. Killjoy, Cypher, Sage).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Duelist">
+            <div class="term-card">
+                <h4 class="term-title">DUELISTA</h4>
+                <p class="term-category">ROL</p>
+                <p class="term-definition">
+                    Agente diseñado para tomar duelos, entrar primero a los sitios y buscar *kills* rápidos (ej. Jett, Reyna, Phoenix).
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Utility Uso">
+            <div class="term-card">
+                <h4 class="term-title">USO DE UTILITY</h4>
+                <p class="term-category">MECÁNICA</p>
+                <p class="term-definition">
+                    La clave del juego. Usar el *kit* de habilidades para obtener ventaja táctica, más importante que solo tener buena puntería.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Ace">
+            <div class="term-card">
+                <h4 class="term-title">ACE</h4>
+                <p class="term-category">PUNTUACIÓN</p>
+                <p class="term-definition">
+                    Eliminar a los cinco jugadores del equipo enemigo en una sola ronda. Es la jugada más impresionante que se puede realizar.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Clutch">
+            <div class="term-card">
+                <h4 class="term-title">CLUTCH</h4>
+                <p class="term-category">PUNTUACIÓN</p>
+                <p class="term-definition">
+                    Ganar una ronda cuando estás solo (1vX) contra múltiples enemigos. Requiere nervios de acero y mucha paciencia.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Trading">
+            <div class="term-card">
+                <h4 class="term-title">TRADING / INTERCAMBIO</h4>
+                <p class="term-category">COMBATE</p>
+                <p class="term-definition">
+                    Asegurar que, cuando un compañero muere, alguien más en el equipo elimina inmediatamente al jugador enemigo que realizó el *kill*.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Peeking">
+            <div class="term-card">
+                <h4 class="term-title">PEEKING / ASOMARSE</h4>
+                <p class="term-category">MOVIMIENTO</p>
+                <p class="term-definition">
+                    Asomarse rápidamente a un ángulo para tomar un duelo o recopilar información. Debe hacerse con el movimiento correcto (ej. *Strafe* o *Jiggle*).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Spray">
+            <div class="term-card">
+                <h4 class="term-title">SPRAY / RAFAGUEAR</h4>
+                <p class="term-category">MECÁNICA</p>
+                <p class="term-definition">
+                    Disparar de forma continua, controlando el patrón de retroceso del arma (el *recoil*) con movimientos sutiles del mouse.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-md-4 col-lg-3 term-item" data-term="Headshot">
+            <div class="term-card">
+                <h4 class="term-title">HEADSHOT / HS</h4>
+                <p class="term-category">PUNTUACIÓN</p>
+                <p class="term-definition">
+                    Disparo directo a la cabeza. Es la forma más rápida y efectiva de eliminar a un oponente, ya que multiplica el daño.
+                </p>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('#searchInput');
+        const glossaryItems = document.querySelectorAll('.term-item');
+
+        function filterGlosario() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+
+            glossaryItems.forEach(item => {
+                const termTitle = item.querySelector('.term-title')?.textContent.toLowerCase() || '';
+                const termDefinition = item.querySelector('.term-definition')?.textContent.toLowerCase() || '';
+                const termCategory = item.querySelector('.term-category')?.textContent.toLowerCase() || '';
+
+                // Buscamos en el Título, Categoría o Definición
+                if (termTitle.includes(searchTerm) || termDefinition.includes(searchTerm) || termCategory.includes(searchTerm)) {
+                    item.style.display = 'block'; 
+                } else {
+                    item.style.display = 'none'; 
+                }
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', filterGlosario);
+        }
+    });
+</script>
+
+{% endblock %}
