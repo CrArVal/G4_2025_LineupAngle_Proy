@@ -2,7 +2,9 @@
 {% load static %}
 
 <nav class="navbar navbar-dark bg-dark fixed-top">
-  <div class="container-fluid position-relative"> <button class="navbar-toggler" type="button" 
+  <div class="container-fluid position-relative">
+    
+    <button class="navbar-toggler" type="button" 
             data-bs-toggle="offcanvas" 
             data-bs-target="#offcanvasDarkNavbar" 
             aria-controls="offcanvasDarkNavbar" 
@@ -19,18 +21,19 @@
     <div class="d-none d-lg-flex align-items-center gap-2">
         {% if user.is_authenticated %}
             <div class="dropdown">
-                <button class="btn btn-outline-info dropdown-toggle btn-sm fw-bold" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username|truncatechars:10 }}
+                <button class="btn btn-outline-info dropdown-toggle btn-sm fw-bold d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle fs-5"></i> 
+                    {{ user.first_name|default:user.username|truncatechars:10 }}
                 </button>
-                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                  <li><a class="dropdown-item" href="{% url 'perfil_publico' username=user.username %}">Mi Perfil</a></li>
-    
-                  <li><a class="dropdown-item" href="{% url 'change_password' %}">Cambiar Contraseña</a></li>
-    
-                  <li><hr class="dropdown-divider"></li>
-                  <li>
-                    <a class="dropdown-item text-danger logout-action" href="#">Cerrar Sesión</a>
-                  </li>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg border-secondary">
+                    <li><a class="dropdown-item" href="{% url 'perfil_publico' username=user.username %}">Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="{% url 'change_password' %}">Cambiar Contraseña</a></li>
+                    <li><hr class="dropdown-divider border-secondary"></li>
+                    <li>
+                        <a class="dropdown-item text-danger logout-action fw-bold" href="#">
+                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                        </a>
+                    </li>
                 </ul>
             </div>
         {% else %}
@@ -61,7 +64,7 @@
           </li>
           
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'fundamentos' %}">Jugador Nuevo</a>
+            <a class="nav-link "  href="{% url 'fundamentos' %}">Fundamentos</a>
           </li>
           
           <li class="nav-item">
@@ -72,11 +75,19 @@
           </li>
 
           <hr style="color: var(--texto-secundario);">
-
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'nosotros' %}">Nosostros</a>
+          </li><li class="nav-item">
+            <a class="nav-link" href="{% url 'noticias' %}">Noticias</a>
+          </li>
           <div class="d-lg-none"> 
               {% if user.is_authenticated %}
                   <li class="nav-item">
-                      <a class="nav-link" href="{% url 'perfil_publico' username=user.username %}">Mi Perfil</a> </li>
+                      <a class="nav-link" href="{% url 'perfil_publico' username=user.username %}">Mi Perfil</a> 
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="{% url 'change_password' %}">Cambiar Contraseña</a> 
+                  </li>
                   <li class="nav-item">
                       <a class="nav-link logout-action" href="#" style="color: var(--acento-principal);">Cerrar Sesión</a>
                   </li>
@@ -113,45 +124,90 @@
 </script>
 
 <script type="module">
+    // 1. IMPORTACIONES (Todo junto para mantener el orden)
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     
+    // 2. CARGA DE CONFIGURACIÓN
     const firebaseConfigElement = document.getElementById('firebase-config');
     let firebaseConfig = {};
     try {
         firebaseConfig = JSON.parse(firebaseConfigElement.textContent);
     } catch (e) {
-        console.error("FIREBASE CONFIG ERROR", e);
+        console.error("FIREBASE CONFIG ERROR: Fallo al parsear la configuración.", e);
     }
 
+    // 3. INICIALIZACIÓN SEGURA (Evita duplicate-app)
     let app;
     if (getApps().length === 0) {
         app = initializeApp(firebaseConfig);
     } else {
         app = getApp();
     }
-    window.global_auth = getAuth(app); 
+
+    // Inicializamos servicios globales
+    const auth = getAuth(app);
+    const db = getFirestore(app); // 🟢 Inicializamos Firestore aquí
+
+    window.global_auth = auth; 
     
     // ==========================================================
-    // LÓGICA DE LOGOUT (ACTUALIZADA PARA USAR CLASES)
+    // 🟢 SISTEMA DE ESTADO ONLINE (HEARTBEAT)
     // ==========================================================
-    
-    // Buscamos TODOS los botones con la clase 'logout-action'
-    // Esto permite tener el botón tanto en el menú móvil como en la barra superior
+    function startHeartbeat(user) {
+        const userRef = doc(db, "users", user.uid);
+
+        // Función para actualizar el timestamp en Firebase
+        const setOnline = async () => {
+            try {
+                await updateDoc(userRef, {
+                    estado: 'online',
+                    ultima_vez: serverTimestamp()
+                });
+                // console.log("Heartbeat enviado ❤️"); // Descomentar para depurar
+            } catch (e) {
+                // Silencioso para no molestar al usuario si falla la red
+                console.warn("Error enviando heartbeat:", e);
+            }
+        };
+
+        // 1. Ejecutar inmediatamente
+        setOnline();
+
+        // 2. Mantener vivo cada 2 minutos (120,000 ms)
+        const intervalId = setInterval(setOnline, 120000);
+
+        // Limpieza si la pestaña se cierra (Opcional, buenas prácticas)
+        window.addEventListener('beforeunload', () => {
+            clearInterval(intervalId);
+        });
+    }
+
+    // 🚨 ACTIVADOR: Escucha si el usuario inicia sesión
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Si hay usuario, iniciamos el latido
+            startHeartbeat(user);
+        }
+    });
+
+    // ==========================================================
+    // LÓGICA DE LOGOUT
+    // ==========================================================
     const logoutButtons = document.querySelectorAll('.logout-action');
     
     function deleteFirebaseCookie() {
         document.cookie = 'firebaseToken=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/;';
     }
 
-    // Asignamos el evento a cada botón encontrado
     logoutButtons.forEach(button => {
         button.addEventListener('click', async (event) => {
             event.preventDefault(); 
             
-            if (window.global_auth) {
+            if (auth) {
                 try {
-                    await signOut(window.global_auth); 
+                    await signOut(auth); 
                 } catch (error) {
                     console.warn("Error al cerrar sesión en Firebase:", error);
                 }
@@ -160,7 +216,6 @@
             deleteFirebaseCookie();
             localStorage.removeItem('firebaseToken'); 
 
-            // Envío POST para logout
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = "{% url 'logout' %}";

@@ -7,45 +7,62 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         
-        <div class="col-lg-4 mb-4">
+<div class="col-lg-4 mb-4">
             <div class="card bg-dark text-white border-secondary shadow h-100">
                 <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
-                    <h2 class="fw-bold text-white mt-2 mb-1">
-                        {{ perfil_user.first_name|default:perfil_user.username }}
-                    </h2>
-                    <br>
-                    <div class="position-relative mb-3">
-                        <img src="{% static 'images/avatars/' %}{{ user_data.avatar|default:'default.png' }}" 
-                            alt="Avatar" 
-                            class="rounded-circle border border-3 border-danger p-1" 
-                            style="width: 150px; height: 150px; object-fit: cover; background-color: #212529;">
-    
+                    
+<div class="position-relative mb-3">
+                        <img src="{% static 'images/avatars/' %}{{ user_data.avatar|default:'mascotasin.png' }}" 
+                             alt="Avatar" 
+                             class="rounded-circle border border-3 {% if es_online %}border-success{% else %}border-secondary{% endif %} p-1" 
+                             style="width: 150px; height: 150px; object-fit: cover; background-color: #212529;">
+                        
+                        {% if es_online %}
+                            <span class="position-absolute p-2 bg-success border border-dark border-2 rounded-circle"
+                                  title="En Línea"
+                                  style="bottom: 0; right: 0; transform: translate(30%, 30%); z-index: 1;">
+                                <span class="visually-hidden">Online</span>
+                            </span>
+                        {% else %}
+                            <span class="position-absolute p-2 bg-secondary border border-dark border-2 rounded-circle"
+                                  title="Desconectado"
+                                  style="bottom: 0; right: 0; transform: translate(30%, 30%); z-index: 1;">
+                                <span class="visually-hidden">Offline</span>
+                            </span>
+                        {% endif %}
+
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info text-dark">
                             {{ user_data.region|default:"N/A" }}
                         </span>
                     </div>
 
+                    <h2 class="fw-bold text-white mt-2 mb-1" style="user-select: none;">
+                        {{ perfil_user.first_name|default:perfil_user.username }}
+                    </h2>
+
                     <div class="mb-4">
-                        <span style="color: #00ffff; font-weight: 800; font-size: 1.2rem; letter-spacing: 1px;">
+                        <span class="text-uppercase fw-bold" style="color: #00ffff; font-size: 0.75rem; letter-spacing: 2px; user-select: none;">
                             RIOT ID
                         </span>
                         
-                        <div class="d-flex justify-content-center align-items-center gap-2">
-                            <span id="riot-id-text" class="fs-5 text-light">
+                        <div class="d-flex justify-content-center align-items-center mt-1 gap-2">
+                            <span id="riot-id-text" class="fs-4 text-white fw-bold">
                                 {{ user_data.riot_id|default:"--" }}
                             </span>
 
                             {% if user_data.riot_id %}
-                            <button class="btn btn-sm btn-outline-info border-0 p-0" 
-                                    style="width: 25px; height: 25px;" 
+                            <button class="btn btn-sm btn-outline-dark border-secondary text-info p-1" 
+                                    type="button"
                                     onclick="copyRiotId()" 
-                                    title="Copiar Riot ID">
-                                <i class="bi bi-clipboard" id="copy-icon"></i>
+                                    style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;"
+                                    title="Copiar">
+                                <i class="bi bi-clipboard-fill" id="copy-icon"></i>
                             </button>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="badge bg-secondary text-uppercase p-2 mb-4 fs-6" style="letter-spacing: 1px;">
+
+                    <div class="badge bg-secondary text-uppercase p-2 mb-4 fs-6" style="letter-spacing: 1px; user-select: none;">
                         Rango: <span class="text-info">{{ user_data.rango|default:"Unranked" }}</span>
                     </div>
 
@@ -68,7 +85,11 @@
                     <div class="mb-4">
                         <h6 class="text-secondary text-uppercase small fw-bold">Sobre mí</h6>
                         <p class="lead fs-6" style="color: #ece8e1;">
-                            {{ user_data.bio|default:"Este agente mantiene su información clasificada." }}
+                            {% if user_data.bio %}
+                                {{ user_data.bio }}
+                            {% else %}
+                                <em class="text-muted">Este agente mantiene su información clasificada. (Sin biografía)</em>
+                            {% endif %}
                         </p>
                     </div>
 
@@ -99,33 +120,55 @@
                 </div>
             </div>
         </div>
-        
+        <div class="col-lg-8 mb-4">
+            <div class="card bg-dark text-white border-secondary shadow h-100">
+                <div class="card-header border-secondary bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="text-info mb-0 fw-bold"><i class="bi bi-calendar3 me-2"></i> Disponibilidad</h5>
+                    <span class="badge bg-secondary text-dark">Horario Local</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 text-center">
+                        <div class="col-6 col-md"><div class="p-2 border border-secondary rounded bg-opacity-10 bg-secondary"><small class="text-muted d-block">LUN</small><span class="fw-bold text-white small">{{ user_data.horario.lunes|default:"--" }}</span></div></div>
+                        <div class="col-6 col-md"><div class="p-2 border border-secondary rounded bg-opacity-10 bg-secondary"><small class="text-muted d-block">MAR</small><span class="fw-bold text-white small">{{ user_data.horario.martes|default:"--" }}</span></div></div>
+                        <div class="col-6 col-md"><div class="p-2 border border-secondary rounded bg-opacity-10 bg-secondary"><small class="text-muted d-block">MIE</small><span class="fw-bold text-white small">{{ user_data.horario.miercoles|default:"--" }}</span></div></div>
+                        <div class="col-6 col-md"><div class="p-2 border border-secondary rounded bg-opacity-10 bg-secondary"><small class="text-muted d-block">JUE</small><span class="fw-bold text-white small">{{ user_data.horario.jueves|default:"--" }}</span></div></div>
+                        
+                        <div class="col-12 mt-2"><hr class="border-secondary"></div>
+                        
+                        <div class="col-4"><div class="p-2 border border-info rounded bg-opacity-10 bg-info"><small class="text-info d-block fw-bold">VIE</small><span class="fw-bold text-white small">{{ user_data.horario.viernes|default:"--" }}</span></div></div>
+                        <div class="col-4"><div class="p-2 border border-info rounded bg-opacity-10 bg-info"><small class="text-info d-block fw-bold">SÁB</small><span class="fw-bold text-white small">{{ user_data.horario.sabado|default:"--" }}</span></div></div>
+                        <div class="col-4"><div class="p-2 border border-info rounded bg-opacity-10 bg-info"><small class="text-info d-block fw-bold">DOM</small><span class="fw-bold text-white small">{{ user_data.horario.domingo|default:"--" }}</span></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 <script>
     function copyRiotId() {
-        // 1. Obtenemos el texto del Riot ID
-        const riotIdText = document.getElementById('riot-id-text').innerText;
+        // 1. Obtenemos el texto del Riot ID limpio
+        const riotIdText = document.getElementById('riot-id-text').innerText.trim();
         const icon = document.getElementById('copy-icon');
 
-        // 2. Usamos la API del portapapeles del navegador
+        // 2. Usamos la API del portapapeles
         navigator.clipboard.writeText(riotIdText).then(() => {
             
-            // 3. Feedback Visual: Cambiar icono a 'Check' (éxito)
-            icon.classList.remove('bi-clipboard');
+            // 3. Feedback Visual: Cambiar icono a 'Check'
+            icon.classList.remove('bi-clipboard-fill');
             icon.classList.add('bi-check-lg');
             
             // 4. Volver al icono original después de 2 segundos
             setTimeout(() => {
                 icon.classList.remove('bi-check-lg');
-                icon.classList.add('bi-clipboard');
+                icon.classList.add('bi-clipboard-fill');
             }, 2000);
 
         }).catch(err => {
             console.error('Error al copiar: ', err);
-            alert('No se pudo copiar automáticamente. Inténtalo manual.');
         });
     }
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 {% endblock %}

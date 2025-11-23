@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from firebase_admin import firestore
 from django.contrib.auth.models import User
 import datetime
+from django.utils import timezone
 
 
 def login(request):
@@ -68,40 +69,80 @@ def status_view(request):
     return render(request, 'comuni/status.html', context)
 
 db = firestore.client()
+# comuni/views.py
+
 @login_required
 def editar_perfil_firebase(request):
     uid = request.user.username
     user_doc_ref = db.collection('users').document(uid)
 
-    # 1. DEFINIR TUS ICONOS DISPONIBLES (Nombres de archivo exactos)
+    # Listas de configuración
     lista_avatares = [
-        'jett.png', 'phoenix.png', 'sage.png', 'reyna.png', 
-        'omen.png', 'sova.png', 'default.png'
+        'ASTRA.png', 'BREACH.png', 'BRIMSTONE.png', 'CHAMBER.png', 'CLOVE.png',
+        'CYPHER.png', 'DEADLOCK.png', 'FADE.png', 'GEKKO.png', 'HARBOR.png',
+        'ISO.png', 'JETT.png', 'KAYO.png', 'KILLJOY.png', 'NEON.png',
+        'OMEN.png', 'PHOENIX.png', 'RAZE.png', 'REYNA.png', 'SAGE.png',
+        'SKYE.png', 'SOVA.png', 'VIPER.png', 'VYSE.png', 'YORU.png',
+        'MASCOTASIN.png'
     ]
+    dias_semana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
 
     if request.method == 'POST':
+        # --- LÓGICA DE GUARDADO ---
         datos_a_actualizar = {}
-        # Agregamos 'avatar' a la lista de campos permitidos
-        campos_posibles = ['riot_id', 'rango', 'region', 'servidor', 'bio', 'avatar']
         
+        # 1. Campos básicos
+        campos_posibles = ['riot_id', 'rango', 'region', 'servidor', 'bio', 'avatar']
         for campo in campos_posibles:
             valor = request.POST.get(campo)
             if valor and valor.strip() != "":
                 datos_a_actualizar[campo] = valor
 
+        # 2. Campos de Horario (Se guardan en un diccionario anidado)
+        horario_data = {}
+        # Primero intentamos leer el horario existente para no borrar días que no se editaron
+        doc_snap = user_doc_ref.get()
+        if doc_snap.exists:
+            current_data = doc_snap.to_dict()
+            horario_data = current_data.get('horario', {})
+
+        # Actualizamos con lo nuevo que venga del formulario
+        hay_cambios_horario = False
+        for dia in dias_semana:
+            valor_dia = request.POST.get(f'horario_{dia}')
+            if valor_dia is not None: # Si el input existe en el form
+                horario_data[dia] = valor_dia
+                hay_cambios_horario = True
+        
+        if hay_cambios_horario:
+            datos_a_actualizar['horario'] = horario_data
+
+        # 3. Enviar a Firestore
         if datos_a_actualizar:
             user_doc_ref.set(datos_a_actualizar, merge=True)
-            messages.success(request, '¡Perfil actualizado!')
+            messages.success(request, '¡Perfil actualizado correctamente!')
         
-        return redirect('home')
+        return redirect('home') 
 
     else:
+        # --- LÓGICA DE LECTURA (GET) ---
         doc = user_doc_ref.get()
-        user_data = doc.to_dict() if doc.exists else {}
+        
+        if doc.exists:
+            user_data = doc.to_dict()
+            # 🚨 ADAPTACIÓN SOLICITADA: Asegurar que 'horario' exista para evitar errores en template
+            if 'horario' not in user_data:
+                user_data['horario'] = {}
+        else:
+            # Si el usuario es nuevo
+            user_data = {'horario': {}}
+
+        # Asegurar avatar por defecto
+        user_data['avatar'] = user_data.get('avatar', 'MASCOTASIN.png')
 
     context = {
         'user_data': user_data,
-        'avatares': lista_avatares, # 2. Enviamos la lista al HTML
+        'avatares': lista_avatares,
         'rangos': [
             'Unranked', 'Hierro', 'Bronce', 'Plata', 'Oro', 
             'Platino', 'Diamante', 'Ascendente', 'Inmortal', 'Radiante'
@@ -110,7 +151,6 @@ def editar_perfil_firebase(request):
     }
     
     return render(request, 'comuni/profile_edit.html', context)
-
 
 @login_required
 def ver_perfil(request):
@@ -126,6 +166,7 @@ def ver_perfil(request):
         user_data = doc.to_dict()
     else:
         user_data = {} # Perfil vacío
+        user_data['avatar'] = user_data.get('avatar', 'mascotasin.png')
 
     context = {
         'user_data': user_data,
@@ -135,35 +176,60 @@ def ver_perfil(request):
 
 
 def ver_perfil_publico(request, username):
-    # 1. BÚSQUEDA POR NOMBRE VISIBLE (first_name)
+    # ---------------------------------------------------------
+    # 1. BÚSQUEDA DE USUARIO (Smart Search)
+    # ---------------------------------------------------------
+    # Primero intentamos buscar por 'Nombre Visible' (first_name)
     perfil_user = User.objects.filter(first_name__iexact=username).first()
 
-    # 2. BÚSQUEDA POR UID (Si no se encontró por nombre)
+    # Si no, intentamos buscar por 'UID' (username de Django)
     if not perfil_user:
-        # En lugar de get_object_or_404, usamos filter().first() que devuelve None si no existe
         perfil_user = User.objects.filter(username=username).first()
     
-    # 3. 🚨 SI NO EXISTE EL USUARIO (CONTROL DE ERROR) 🚨
+    # Si no existe de ninguna forma, error y fuera
     if not perfil_user:
-        # Agregamos un mensaje de error
-        messages.error(request, f"El agente '{username}' no fue encontrado en la base de datos.")
-        # Redirigimos al inicio (o a donde quieras)
+        messages.error(request, f"El agente '{username}' no fue encontrado.")
         return redirect('home')
 
-    # --- Si llegamos aquí, el usuario EXISTE ---
+    # ---------------------------------------------------------
+    # 2. OBTENCIÓN DE DATOS DE FIREBASE
+    # ---------------------------------------------------------
     uid_real = perfil_user.username
-    
     user_doc_ref = db.collection('users').document(uid_real)
     doc = user_doc_ref.get()
     
+    user_data = {}
+    es_online = False # Asumimos offline por defecto
+
     if doc.exists:
         user_data = doc.to_dict()
-    else:
-        user_data = {}
+        
+        # --- CÁLCULO DE ESTADO ONLINE ---
+        ultima_vez = user_data.get('ultima_vez')
+        
+        if ultima_vez:
+            # Obtenemos la hora actual en UTC (zona horaria universal)
+            ahora = datetime.datetime.now(datetime.timezone.utc)
+            
+            # Calculamos la diferencia de tiempo
+            diferencia = ahora - ultima_vez
+            
+            # Si la señal fue hace menos de 3 minutos (180 seg), está ONLINE
+            if diferencia.total_seconds() < 180:
+                es_online = True
+    
+    # ---------------------------------------------------------
+    # 3. LIMPIEZA Y CONTEXTO
+    # ---------------------------------------------------------
+    
+    # Inyectar avatar default si no existe o está vacío
+    # (Esta línea debe estar fuera del if/else para cubrir todos los casos)
+    user_data['avatar'] = user_data.get('avatar', 'mascotasin.png')
 
     context = {
         'perfil_user': perfil_user, 
-        'user_data': user_data,     
+        'user_data': user_data,
+        'es_online': es_online,  # Variable para el punto verde/gris
     }
     
     return render(request, 'comuni/profile_detail.html', context)
@@ -236,8 +302,7 @@ def grupo_detalle_view(request, grupo_id):
     grupo_data = doc.to_dict()
     grupo_data['id'] = doc.id
     
-    # --- 🧠 LÓGICA NUEVA: ENRIQUECER MIEMBROS ---
-    # Recuperamos los datos reales (Nombre, Riot ID) de cada miembro en Firestore
+    # --- ENRIQUECER MIEMBROS CON AVATARES ---
     miembros_detalles = []
     lista_uids = grupo_data.get('miembros', [])
     
@@ -247,7 +312,8 @@ def grupo_detalle_view(request, grupo_id):
         
         if user_profile.exists:
             p_data = user_profile.to_dict()
-            # Intentamos obtener el nombre de Django si es posible, o usamos un default
+            
+            # Intentamos obtener el nombre de Django
             try:
                 user_obj = User.objects.get(username=uid)
                 nombre_web = user_obj.first_name or user_obj.username
@@ -256,9 +322,12 @@ def grupo_detalle_view(request, grupo_id):
 
             miembros_detalles.append({
                 'uid': uid,
-                'nombre': nombre_web, # Nombre en la web
-                'riot_id': p_data.get('riot_id', 'Sin Riot ID'), # Riot ID
-                'rango': p_data.get('rango', 'Unranked')
+                'nombre': nombre_web,
+                'riot_id': p_data.get('riot_id', 'Sin Riot ID'),
+                'rango': p_data.get('rango', 'Unranked'),
+                
+                # 🚨 NUEVO: Recuperamos el avatar guardado o usamos el default
+                'avatar': p_data.get('avatar', 'mascotasin.png') 
             })
         else:
             # Si no tiene perfil configurado
@@ -266,12 +335,15 @@ def grupo_detalle_view(request, grupo_id):
                 'uid': uid,
                 'nombre': 'Agente Desconocido',
                 'riot_id': '--',
-                'rango': 'Unranked'
+                'rango': 'Unranked',
+                
+                # 🚨 NUEVO: Avatar default
+                'avatar': 'mascotasin.png' 
             })
 
     return render(request, 'comuni/grupo_lobby.html', {
         'grupo': grupo_data,
-        'miembros_detalles': miembros_detalles # Pasamos la lista con datos
+        'miembros_detalles': miembros_detalles
     })
 
 # --- 🆕 NUEVA VISTA: ACTUALIZAR CÓDIGO DE PARTIDA ---

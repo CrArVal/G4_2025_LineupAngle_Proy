@@ -4,180 +4,196 @@
 {% block content %}
 <div style="height: 100px;"></div>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card bg-dark text-white border-secondary shadow">
-                <div class="card-header border-secondary text-center">
-                    <h3 class="text-info fw-bold">Editar Perfil de Agente</h3>
-                </div>
-                <div class="card-body p-4">
-                    
-                    <form method="POST">
-                        {% csrf_token %}
+<div class="container mb-5">
+    <form method="POST">
+        {% csrf_token %}
 
-                        <div class="mb-4">
-                            <label class="form-label text-info fw-bold">Riot ID</label>
-                            <input type="text" name="riot_id" class="form-control bg-secondary text-white border-0" 
-                                   value="{{ user_data.riot_id|default:'' }}" 
-                                   placeholder="Ej: Faker#KR1">
+        <div class="row justify-content-center">
+            
+            <div class="col-md-8 mb-4">
+                <div class="card bg-dark text-white border-secondary shadow">
+                    <div class="card-header border-secondary bg-dark-panel">
+                        <h4 class="text-info fw-bold m-0"><i class="bi bi-person-vcard me-2"></i>Datos del Agente</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary fw-bold small">RIOT ID</label>
+                                <input type="text" name="riot_id" class="form-control bg-dark text-white border-secondary" 
+                                       value="{{ user_data.riot_id|default:'' }}" placeholder="Ej: Faker#KR1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary fw-bold small">RANGO</label>
+                                <select name="rango" class="form-select bg-dark text-white border-secondary">
+                                    <option value="" disabled>Selecciona Rango</option>
+                                    {% for rango in rangos %}
+                                        <option value="{{ rango }}" {% if user_data.rango == rango %}selected{% endif %}>{{ rango }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label text-info fw-bold">Rango Competitivo</label>
-                            <select name="rango" class="form-select bg-secondary text-white border-0">
-                                <option value="" disabled {% if not user_data.rango %}selected{% endif %}>Selecciona Rango</option>
-                                {% for rango in rangos %}
-                                    <option value="{{ rango }}" {% if user_data.rango == rango %}selected{% endif %}>
-                                        {{ rango }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <hr class="border-secondary my-4">
-
-                        <div class="mb-4">
-                            <label class="form-label text-info fw-bold">Elige tu Icono</label>
-                            
-                            <input type="hidden" name="avatar" id="selected_avatar" value="{{ user_data.avatar|default:'default.png' }}">
-                            
-                            <div class="d-flex flex-wrap gap-3 justify-content-center p-3 rounded border border-secondary" style="background-color: #131b24;">
+                            <label class="form-label text-secondary fw-bold small">ICONO DE PERFIL</label>
+                            <input type="hidden" name="avatar" id="selected_avatar" value="{{ user_data.avatar|default:'MASCOTASIN.png' }}">
+                            <div class="d-flex flex-wrap gap-2 justify-content-start p-3 rounded border border-secondary" style="background-color: #151f2b;">
                                 {% for avatar_file in avatares %}
                                     <img src="{% static 'images/avatars/' %}{{ avatar_file }}" 
-                                         alt="{{ avatar_file }}"
                                          class="avatar-option rounded-circle transition-all"
-                                         style="width: 60px; height: 60px; object-fit: cover; cursor: pointer; border: 3px solid transparent; opacity: 0.6; transition: all 0.2s;"
+                                         style="width: 50px; height: 50px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.5;"
                                          onclick="selectAvatar('{{ avatar_file }}', this)">
-                                {% empty %}
-                                    <p class="text-muted small">No se cargaron avatares. Revisa tu vista.</p>
                                 {% endfor %}
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label text-info fw-bold">Región</label>
-                                <select name="region" id="id_region" class="form-select bg-secondary text-white border-0">
-                                    <option value="" disabled {% if not user_data.region %}selected{% endif %}>Selecciona Región</option>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary fw-bold small">REGIÓN</label>
+                                <select name="region" id="id_region" class="form-select bg-dark text-white border-secondary">
+                                    <option value="" disabled>Selecciona...</option>
                                     {% for region in regiones %}
-                                        <option value="{{ region }}" {% if user_data.region == region %}selected{% endif %}>
-                                            {{ region }}
-                                        </option>
+                                        <option value="{{ region }}" {% if user_data.region == region %}selected{% endif %}>{{ region }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
-
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label text-info fw-bold">Servidor Preferido</label>
-                                <select name="servidor" id="id_servidor" class="form-select bg-secondary text-white border-0">
-                                    <option value="{{ user_data.servidor|default:'' }}" selected>
-                                        {{ user_data.servidor|default:'Cargando...' }}
-                                    </option>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary fw-bold small">SERVIDOR</label>
+                                <select name="servidor" id="id_servidor" class="form-select bg-dark text-white border-secondary">
+                                    <option value="{{ user_data.servidor|default:'' }}" selected>{{ user_data.servidor|default:'Cargando...' }}</option>
                                 </select>
                             </div>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label text-info fw-bold">Bio</label>
-                            <textarea name="bio" class="form-control bg-secondary text-white border-0" rows="2">{{ user_data.bio|default:'' }}</textarea>
+
+                        <div class="mb-0">
+                            <label class="form-label text-secondary fw-bold small">SOBRE MÍ</label>
+                            <textarea name="bio" class="form-control bg-dark text-white border-secondary" rows="2">{{ user_data.bio|default:'' }}</textarea>
                         </div>
 
-                        <div class="d-grid gap-2 mt-3">
-                            <button type="submit" class="btn btn-success fw-bold">GUARDAR CAMBIOS</button>
-                            <a href="{% url 'home' %}" class="btn btn-outline-light">Cancelar</a>
-                        </div>
-                    </form>
-
+                    </div>
                 </div>
             </div>
+
+            <div class="col-md-8 mb-4">
+                <div class="card bg-dark text-white border-info shadow">
+                    <div class="card-header border-info bg-dark-panel d-flex justify-content-between align-items-center">
+                        <h4 class="text-info fw-bold m-0"><i class="bi bi-calendar-week me-2"></i>Cronograma Operativo</h4>
+                        <span class="badge bg-info text-dark">Horario Local</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted small mb-4">Indica en qué horarios sueles jugar.</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-secondary text-dark border-0 fw-bold text-uppercase" style="width: 90px; font-size: 0.75rem;">Lunes</span>
+                                    <input type="text" name="horario_lunes" class="form-control bg-dark text-white border-secondary" 
+                                           placeholder="Ej: 18:00 - 22:00" value="{{ user_data.horario.lunes|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-secondary text-dark border-0 fw-bold text-uppercase" style="width: 90px; font-size: 0.75rem;">Martes</span>
+                                    <input type="text" name="horario_martes" class="form-control bg-dark text-white border-secondary" 
+                                           value="{{ user_data.horario.martes|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-secondary text-dark border-0 fw-bold text-uppercase" style="width: 90px; font-size: 0.75rem;">Miércoles</span>
+                                    <input type="text" name="horario_miercoles" class="form-control bg-dark text-white border-secondary" 
+                                           value="{{ user_data.horario.miercoles|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-secondary text-dark border-0 fw-bold text-uppercase" style="width: 90px; font-size: 0.75rem;">Jueves</span>
+                                    <input type="text" name="horario_jueves" class="form-control bg-dark text-white border-secondary" 
+                                           value="{{ user_data.horario.jueves|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4"><h6 class="text-white fw-bold border-bottom border-secondary pb-2">Fin de Semana</h6></div>
+
+                            <div class="col-md-4">
+                                <label class="text-info small fw-bold text-uppercase mb-1">Viernes</label>
+                                <input type="text" name="horario_viernes" class="form-control bg-dark text-white border-info" 
+                                       placeholder="Full Time" value="{{ user_data.horario.viernes|default:'' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="text-info small fw-bold text-uppercase mb-1">Sábado</label>
+                                <input type="text" name="horario_sabado" class="form-control bg-dark text-white border-info" 
+                                       value="{{ user_data.horario.sabado|default:'' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="text-info small fw-bold text-uppercase mb-1">Domingo</label>
+                                <input type="text" name="horario_domingo" class="form-control bg-dark text-white border-info" 
+                                       value="{{ user_data.horario.domingo|default:'' }}">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 d-grid gap-2">
+                <button type="submit" class="btn btn-success btn-lg fw-bold shadow-lg">
+                    <i class="bi bi-save me-2"></i> GUARDAR PERFIL COMPLETO
+                </button>
+                <a href="{% url 'home' %}" class="btn btn-outline-light">Cancelar</a>
+            </div>
+
         </div>
-    </div>
+    </form>
 </div>
 
 <script>
-    // --- FUNCIÓN PARA SELECCIONAR AVATAR (Global para el onclick) ---
+    // 1. Lógica de Avatar
     function selectAvatar(filename, imgElement) {
-        // 1. Actualizar input oculto
         document.getElementById('selected_avatar').value = filename;
-
-        // 2. Resetear estilos de todos
         document.querySelectorAll('.avatar-option').forEach(img => {
-            img.style.borderColor = "transparent";
-            img.style.transform = "scale(1)";
-            img.style.opacity = "0.6";
+            img.style.borderColor = "transparent"; img.style.opacity = "0.5"; img.style.transform = "scale(1)";
         });
-
-        // 3. Resaltar seleccionado
-        imgElement.style.borderColor = "#00ffff"; // Cian
-        imgElement.style.transform = "scale(1.1)";
-        imgElement.style.opacity = "1";
+        imgElement.style.borderColor = "#00ffff"; imgElement.style.opacity = "1"; imgElement.style.transform = "scale(1.1)";
     }
 
+    // Inicializar Avatar
     document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. INICIALIZACIÓN DE AVATAR ---
         const currentAvatar = document.getElementById('selected_avatar').value;
-        const images = document.querySelectorAll('.avatar-option');
-        
-        images.forEach(img => {
-            // Si la URL de la imagen contiene el nombre guardado
+        document.querySelectorAll('.avatar-option').forEach(img => {
             if (img.src.includes(currentAvatar)) {
-                img.style.borderColor = "#00ffff";
-                img.style.opacity = "1";
-                img.style.transform = "scale(1.1)";
+                img.style.borderColor = "#00ffff"; img.style.opacity = "1"; img.style.transform = "scale(1.1)";
             }
         });
-
-
-        // --- 2. LÓGICA DE SERVIDORES ---
+        
+        // 2. Lógica de Servidores
         const regionSelect = document.getElementById('id_region');
         const serverSelect = document.getElementById('id_servidor');
         const savedServer = "{{ user_data.servidor|default:'' }}"; 
-
         const serversData = {
-            'NA': ['US East (N. Virginia)', 'US West (N. California)', 'US Central (Illinois)', 'US Texas', 'US West (Oregon)'],
+            'NA': ['US East', 'US West', 'US Central', 'US Texas'],
             'LATAM': ['Santiago', 'Mexico City', 'Miami', 'Bogota'],
             'BR': ['Sao Paulo'],
-            'EU': ['Frankfurt', 'Paris', 'London', 'Madrid', 'Warsaw', 'Istanbul'],
-            'KR': ['Seoul'],
-            'AP': ['Tokyo', 'Singapore', 'Sydney', 'Mumbai']
+            'EU': ['Frankfurt', 'Paris', 'London', 'Madrid'],
+            'KR': ['Seoul'], 'AP': ['Tokyo', 'Singapore', 'Sydney']
         };
 
         function updateServers() {
             const selectedRegion = regionSelect.value;
             serverSelect.innerHTML = ''; 
-
             if (selectedRegion && serversData[selectedRegion]) {
-                const defaultOption = document.createElement('option');
-                defaultOption.text = "-- Selecciona Servidor --";
-                defaultOption.value = "";
-                serverSelect.appendChild(defaultOption);
-
                 serversData[selectedRegion].forEach(server => {
                     const option = document.createElement('option');
-                    option.value = server;
-                    option.textContent = server;
-                    if (server === savedServer) {
-                        option.selected = true;
-                    }
+                    option.value = server; option.textContent = server;
+                    if (server === savedServer) option.selected = true;
                     serverSelect.appendChild(option);
                 });
             } else {
-                const option = document.createElement('option');
-                option.text = savedServer || "-- Selecciona una región primero --";
-                serverSelect.appendChild(option);
+                 const option = document.createElement('option'); option.text = savedServer || "Selecciona Región"; serverSelect.appendChild(option);
             }
         }
-
-        regionSelect.addEventListener('change', function() {
-            serverSelect.value = ""; 
-            updateServers();
-        });
-
-        if (regionSelect.value) {
-            updateServers();
-        }
+        regionSelect.addEventListener('change', function() { serverSelect.value = ""; updateServers(); });
+        if (regionSelect.value) updateServers();
     });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 {% endblock %}
