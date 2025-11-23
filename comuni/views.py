@@ -6,30 +6,25 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from firebase_admin import firestore
 from django.contrib.auth.models import User
-def register(request):
-    return render(request, 'comuni/register.html')
+
 
 def login(request):
     return render(request, 'comuni/login.html')
 
+# comuni/views.py
+from django.shortcuts import render, redirect
+
 def register_view(request):
+    
+    if request.user.is_authenticated:
+        return redirect('home') 
+
+    
     if request.method == 'POST':
-        # Usa tu formulario personalizado
-        form = CustomUserCreationForm(request.POST) 
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, "¡Registro exitoso! Bienvenido.")
-            return redirect('home')
-        else:
-            # Si hay errores (ej. usuario ya existe), se mostrarán
-            messages.error(request, "Hubo un error en el registro. Revisa los campos.")
-    else:
-        # Muestra un formulario vacío
-        form = CustomUserCreationForm() 
-        
-    # Pasa el formulario (ya sea vacío o con errores) a la plantilla
-    return render(request, 'comuni/register.html', {'form': form})
+        return redirect('home')
+
+    
+    return render(request, 'comuni/register.html')
 
 @login_required  # <-- Este es el "guardia de seguridad"
 def perfil_view(request):
@@ -187,3 +182,23 @@ def buscar_usuario(request):
     else:
         # Si buscaron vacío, vuelve al inicio
         return redirect('home')
+    
+def check_username_availability(request):
+    username = request.GET.get('username', '').strip()
+    
+    if not username:
+        return JsonResponse({'exists': False})
+
+    # Buscamos en la base de datos de Django si alguien ya tiene ese 'first_name'
+    # Usamos __iexact para que no importe mayúsculas/minúsculas (Cris == cris)
+    exists = User.objects.filter(first_name__iexact=username).exists()
+    
+    return JsonResponse({'exists': exists})
+
+def forgot_password_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    return render(request, 'comuni/forgot_password.html')
+@login_required
+def change_password_view(request):
+    return render(request, 'comuni/change_password.html')

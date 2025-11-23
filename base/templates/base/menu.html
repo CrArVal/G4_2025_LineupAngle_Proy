@@ -2,9 +2,7 @@
 {% load static %}
 
 <nav class="navbar navbar-dark bg-dark fixed-top">
-  <div class="container-fluid d-flex justify-content-between">
-    
-    <button class="navbar-toggler me-2" type="button" 
+  <div class="container-fluid position-relative"> <button class="navbar-toggler" type="button" 
             data-bs-toggle="offcanvas" 
             data-bs-target="#offcanvasDarkNavbar" 
             aria-controls="offcanvasDarkNavbar" 
@@ -12,13 +10,34 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <a class="navbar-brand mx-auto d-flex align-items-center" href="{% url 'home' %}">
+    <a class="navbar-brand position-absolute start-50 translate-middle-x" href="{% url 'home' %}">
       <img src="{% static 'images/mascotasin.png' %}" alt="Logo" 
            style="height: 57px; margin-right: 8px; object-fit: contain;">
-      <span class="fw-bold text-white">LineUp Angle</span>
+      <span class="fw-bold text-white d-none d-sm-inline">Lineup Angle</span>
     </a>
     
-    <div style="width:40px;"></div>
+    <div class="d-none d-lg-flex align-items-center gap-2">
+        {% if user.is_authenticated %}
+            <div class="dropdown">
+                <button class="btn btn-outline-info dropdown-toggle btn-sm fw-bold" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username|truncatechars:10 }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                  <li><a class="dropdown-item" href="{% url 'perfil_publico' username=user.username %}">Mi Perfil</a></li>
+    
+                  <li><a class="dropdown-item" href="{% url 'change_password' %}">Cambiar Contraseña</a></li>
+    
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger logout-action" href="#">Cerrar Sesión</a>
+                  </li>
+                </ul>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm fw-semibold">Iniciar Sesión</a>
+            <a href="{% url 'register' %}" class="btn btn-info btn-sm fw-bold text-dark">Registrarse</a>
+        {% endif %}
+    </div>
 
     <div class="offcanvas offcanvas-start text-bg-dark" 
          tabindex="-1" 
@@ -29,7 +48,7 @@
         {% if user.is_authenticated %}
             <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Hola, {{ user.first_name|default:user.username }}</h5>
         {% else %}
-            <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Bienvenido a LineupAngle</h5>
+            <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Bienvenido</h5>
         {% endif %}
         <button type="button" class="btn-close btn-close-white" 
                 data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
@@ -44,41 +63,39 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'fundamentos' %}">Jugador Nuevo</a>
           </li>
-
+          
           <li class="nav-item">
             <a class="nav-link" href="{% url 'lineuphome' %}">Lineups</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Comunidad</a>
           </li>
-                    <li class="nav-item">
-            <a class="nav-link" href="{% url 'nosotros' %}">Nosotros</a>
-          </li>
 
           <hr style="color: var(--texto-secundario);">
 
-          {% if user.is_authenticated %}
-              <li class="nav-item">
-                
-
-                  <a class="nav-link" href="{% url 'perfil_publico' username=user.username %}">Mi Perfil</a>
-              <li class="nav-item">
-                  <a class="nav-link" href="#" id="logout-button" style="color: var(--acento-principal);">Cerrar Sesión</a>
-              </li>
-          {% else %}
-              <li class="nav-item">
-                  <a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="{% url 'register' %}">Registrarse</a> 
-              </li>
-          {% endif %}
-          </ul>
+          <div class="d-lg-none"> 
+              {% if user.is_authenticated %}
+                  <li class="nav-item">
+                      <a class="nav-link" href="{% url 'perfil_publico' username=user.username %}">Mi Perfil</a> </li>
+                  <li class="nav-item">
+                      <a class="nav-link logout-action" href="#" style="color: var(--acento-principal);">Cerrar Sesión</a>
+                  </li>
+              {% else %}
+                  <li class="nav-item">
+                      <a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="{% url 'register' %}">Registrarse</a> 
+                  </li>
+              {% endif %}
+          </div>
+        </ul>
 
         <form class="d-flex mt-3" role="search" action="{% url 'buscar_usuario' %}" method="GET">
-          <input class="form-control me-2" type="search" name="q" placeholder="Buscar Agente (Nombre)" aria-label="Buscar">
-            <button class="btn btn-success" type="submit">Buscar</button>
+          <input class="form-control me-2" type="search" name="q" placeholder="Buscar Agente" aria-label="Buscar">
+          <button class="btn btn-success" type="submit">Buscar</button>
         </form>
+        
         <div class="mt-auto text-center pt-4">
             <img src="{% static 'images/mascotasinfondo.png' %}" 
                  alt="Mascota LineupAngle" 
@@ -95,21 +112,18 @@
     {{ FIREBASE_CONFIG|safe }}
 </script>
 
-
 <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     
-    // Obtenemos la configuración inyectada por Django
     const firebaseConfigElement = document.getElementById('firebase-config');
     let firebaseConfig = {};
     try {
         firebaseConfig = JSON.parse(firebaseConfigElement.textContent);
     } catch (e) {
-        console.error("FIREBASE CONFIG ERROR: Fallo al parsear la configuración del DOM.", e);
+        console.error("FIREBASE CONFIG ERROR", e);
     }
 
-    // 🛑 INICIALIZACIÓN GLOBAL CENTRALIZADA 🛑
     let app;
     if (getApps().length === 0) {
         app = initializeApp(firebaseConfig);
@@ -119,17 +133,20 @@
     window.global_auth = getAuth(app); 
     
     // ==========================================================
-    // LÓGICA DE LOGOUT
+    // LÓGICA DE LOGOUT (ACTUALIZADA PARA USAR CLASES)
     // ==========================================================
-    const logoutButton = document.getElementById('logout-button');
     
-    // Función auxiliar para borrar la cookie de sesión de Firebase
+    // Buscamos TODOS los botones con la clase 'logout-action'
+    // Esto permite tener el botón tanto en el menú móvil como en la barra superior
+    const logoutButtons = document.querySelectorAll('.logout-action');
+    
     function deleteFirebaseCookie() {
         document.cookie = 'firebaseToken=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/;';
     }
 
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async (event) => {
+    // Asignamos el evento a cada botón encontrado
+    logoutButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
             event.preventDefault(); 
             
             if (window.global_auth) {
@@ -140,17 +157,14 @@
                 }
             }
             
-            // 1. BORRA LA COOKIE y LocalStorage
             deleteFirebaseCookie();
             localStorage.removeItem('firebaseToken'); 
 
-            // 🚨 2. SOLUCIÓN AL ERROR 405: Envía una solicitud POST dinámica 🚨
-            
+            // Envío POST para logout
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = "{% url 'logout' %}";
             
-            // Crea y adjunta el token CSRF (obtenido de las cookies)
             const csrfTokenMatch = document.cookie.match(/csrftoken=([^;]+)/);
             if (csrfTokenMatch) {
                 const input = document.createElement('input');
@@ -161,9 +175,9 @@
             }
 
             document.body.appendChild(form);
-            form.submit(); // Esto envía la solicitud como POST, resolviendo el 405
+            form.submit(); 
         });
-    }
+    });
 </script>
 
 {% block content %}

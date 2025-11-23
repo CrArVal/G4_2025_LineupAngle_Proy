@@ -6,17 +6,15 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <script type="module">
-    // Importa solo las funciones necesarias para el login
     import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     
     // ==========================================================
-    // ⭐️ FUNCIÓN GLOBAL DE ENVÍO A FIREBASE (USANDO LA INSTANCIA GLOBAL) ⭐️
+    // ⭐️ FUNCIÓN GLOBAL DE LOGIN CON FIREBASE ⭐️
     // ==========================================================
     window.handleFirebaseLogin = async function() {
-        // Obtenemos la instancia de auth creada en el menú
+        // Usamos la instancia global creada en el menú
         const auth = window.global_auth; 
 
-        // Obtenemos los valores de los inputs (ya validados)
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const submitButton = document.getElementById('submitButton');
@@ -30,27 +28,26 @@
         submitButton.textContent = 'Ingresando...';
         
         try {
-            // 3. Intenta iniciar sesión con Firebase
+            // 1. Iniciar sesión en Firebase
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 4. Si el login en Firebase fue exitoso, obtiene el token JWT
+            // 2. Obtener Token y crear Cookie
             const idToken = await user.getIdToken(); 
-
-            // 5. Crea la Cookie y LocalStorage para la sesión de Django
             document.cookie = `firebaseToken=${idToken}; max-age=3600; path=/; secure; samesite=Lax`; 
             localStorage.setItem('firebaseToken', idToken);
             
-            // 6. Recarga la página: El middleware de Django leerá el token 
+            // 3. Redirigir al Home (Django leerá la cookie)
             window.location.href = "{% url 'home' %}";
 
         } catch (error) {
-            // 7. Manejo de errores de Firebase
             let errorMessage = "Error desconocido.";
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                errorMessage = "Credenciales incorrectas. Revisa tu email y contraseña.";
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                errorMessage = "Correo o contraseña incorrectos.";
             } else if (error.code === 'auth/invalid-email') {
                 errorMessage = "El formato del correo electrónico es inválido.";
+            } else if (error.code === 'auth/too-many-requests') {
+                errorMessage = "Demasiados intentos fallidos. Inténtalo más tarde.";
             }
             
             alert(`Error al iniciar sesión: ${errorMessage}`);
@@ -77,16 +74,17 @@
         <div class="mb-3">
             <label for="email" class="form-label">Correo Electrónico</label>
             <input type="email" class="form-control" id="email" name="email" required>
-            <div class="invalid-feedback">
-                Por favor, ingresa un correo electrónico válido.
-            </div>
+            <div class="invalid-feedback">Por favor, ingresa un correo electrónico válido.</div>
         </div>
 
         <div class="mb-4">
             <label for="password" class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="password" name="password" required minlength="6"> 
-            <div class="invalid-feedback">
-                La contraseña debe tener al menos 6 caracteres.
+            <div class="input-group">
+                <input type="password" class="form-control" id="password" name="password" required minlength="6"> 
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border-color: var(--texto-secundario); color: var(--texto-secundario);">
+                    <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                </button>
+                <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
             </div>
         </div>
         
@@ -101,7 +99,7 @@
     <br>
     
     <div class="text-center mt-2">
-        <a href="#" class="form-text text-secondary-accent text-decoration-none">
+        <a href="{% url 'forgot_password' %}" class="form-text text-secondary-accent text-decoration-none fw-bold">
             ¿Olvidaste tu contraseña?
         </a>
     </div>
@@ -118,13 +116,32 @@
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         
-        // Función de chequeo de validez (la fuente de verdad para el botón)
+        // --- Función de mostrar/ocultar contraseña ---
+        function setupPasswordToggle(toggleId, inputId, iconId) {
+             const toggleButton = document.getElementById(toggleId);
+             const passwordInput = document.getElementById(inputId);
+             const icon = document.getElementById(iconId);
+
+             if (toggleButton) {
+                 toggleButton.addEventListener('click', function () {
+                     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                     passwordInput.setAttribute('type', type);
+                     if (type === 'text') {
+                         icon.classList.remove('bi-eye-slash'); icon.classList.add('bi-eye');
+                     } else {
+                         icon.classList.remove('bi-eye'); icon.classList.add('bi-eye-slash');
+                     }
+                 });
+             }
+        }
+
+        // --- Función de chequeo de validez ---
         function checkFormValidity() {
             const isNativeValid = loginForm.checkValidity();
             const password = passwordInput.value;
             const email = emailInput.value;
             
-            // 1. Longitud de contraseña y verificación simple de email
+            // Validaciones extra: longitud mínima y email no vacío
             const isCustomValid = (password.length >= 6) && (email.trim() !== '');
             
             const isFormComplete = isNativeValid && isCustomValid;
@@ -132,13 +149,16 @@
             return isFormComplete;
         }
 
+        // Inicialización UX
+        setupPasswordToggle('togglePassword', 'password', 'togglePasswordIcon');
+        
         // Ejecución en tiempo real
         loginForm.addEventListener('keyup', checkFormValidity);
         loginForm.addEventListener('change', checkFormValidity);
         checkFormValidity();
 
 
-        // 🚨 CONTROL DEL SUBMIT (Punto clave para evitar el GET)
+        // 🚨 CONTROL DEL SUBMIT
         loginForm.addEventListener('submit', function(event) {
             event.preventDefault(); 
             event.stopPropagation();
@@ -146,7 +166,7 @@
             loginForm.classList.add('was-validated');
 
             if (checkFormValidity()) {
-                // 🛑 LLAMADA A LA FUNCIÓN GLOBAL DE FIREBASE 🛑
+                // Llamada a la función global
                 if (typeof window.handleFirebaseLogin === 'function') {
                     window.handleFirebaseLogin();
                 } else {
