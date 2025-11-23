@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib import messages
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from firebase_admin import firestore
+from django.contrib.auth.models import User
 def register(request):
     return render(request, 'comuni/register.html')
 
@@ -135,3 +136,54 @@ def ver_perfil(request):
     }
     
     return render(request, 'comuni/perfil.html', context)
+
+
+def ver_perfil_publico(request, username):
+    # 1. BÚSQUEDA POR NOMBRE VISIBLE (first_name)
+    perfil_user = User.objects.filter(first_name__iexact=username).first()
+
+    # 2. BÚSQUEDA POR UID (Si no se encontró por nombre)
+    if not perfil_user:
+        # En lugar de get_object_or_404, usamos filter().first() que devuelve None si no existe
+        perfil_user = User.objects.filter(username=username).first()
+    
+    # 3. 🚨 SI NO EXISTE EL USUARIO (CONTROL DE ERROR) 🚨
+    if not perfil_user:
+        # Agregamos un mensaje de error
+        messages.error(request, f"El agente '{username}' no fue encontrado en la base de datos.")
+        # Redirigimos al inicio (o a donde quieras)
+        return redirect('home')
+
+    # --- Si llegamos aquí, el usuario EXISTE ---
+    uid_real = perfil_user.username
+    
+    user_doc_ref = db.collection('users').document(uid_real)
+    doc = user_doc_ref.get()
+    
+    if doc.exists:
+        user_data = doc.to_dict()
+    else:
+        user_data = {}
+
+    context = {
+        'perfil_user': perfil_user, 
+        'user_data': user_data,     
+    }
+    
+    return render(request, 'comuni/profile_detail.html', context)
+# --- VISTA DE ACCESO RÁPIDO ("MI PERFIL") ---
+def ver_perfil_propio(request):
+    if request.user.is_authenticated:
+        # Redirige a la vista pública usando el ID del usuario actual
+        return redirect('perfil_publico', username=request.user.username)
+    else:
+        return redirect('login')
+    
+def buscar_usuario(request):
+    query = request.GET.get('q') # 'q' es lo que escriben en la caja
+    if query:
+        # Redirige a la vista de perfil usando lo que escribieron
+        return redirect('perfil_publico', username=query)
+    else:
+        # Si buscaron vacío, vuelve al inicio
+        return redirect('home')

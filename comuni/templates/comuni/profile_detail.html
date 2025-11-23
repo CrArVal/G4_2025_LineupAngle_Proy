@@ -10,23 +10,42 @@
         <div class="col-lg-4 mb-4">
             <div class="card bg-dark text-white border-secondary shadow h-100">
                 <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
-                    
+                    <h2 class="fw-bold text-white mt-2 mb-1">
+                        {{ perfil_user.first_name|default:perfil_user.username }}
+                    </h2>
+                    <br>
                     <div class="position-relative mb-3">
-                        <img src="{% static 'images/mascotasin.png' %}" alt="Avatar" class="rounded-circle border border-3 border-danger p-1" style="width: 150px; height: 150px; object-fit: cover; background-color: #212529;">
+                        <img src="{% static 'images/mascotasin.png' %}" 
+                             alt="Avatar" 
+                             class="rounded-circle border border-3 border-danger p-1" 
+                             style="width: 150px; height: 150px; object-fit: cover; background-color: #212529;">
+                        
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info text-dark">
                             {{ user_data.region|default:"N/A" }}
                         </span>
                     </div>
 
-                    <h3 class="fw-bold text-white mb-0">
-                        {{ user_data.riot_id|default:"Agente Sin Nombre" }}
-                    </h3>
-                    
-                    <p class="text-muted small mb-3">
-                        {{ perfil_user.first_name|default:"Usuario" }}
-                    </p>
+                    <div class="mb-4">
+                        <span style="color: #00ffff; font-weight: 800; font-size: 1.2rem; letter-spacing: 1px;">
+                            RIOT ID
+                        </span>
+                        
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <span id="riot-id-text" class="fs-5 text-light">
+                                {{ user_data.riot_id|default:"--" }}
+                            </span>
 
-                    <div class="badge bg-secondary text-uppercase p-2 mb-4 fs-6">
+                            {% if user_data.riot_id %}
+                            <button class="btn btn-sm btn-outline-info border-0 p-0" 
+                                    style="width: 25px; height: 25px;" 
+                                    onclick="copyRiotId()" 
+                                    title="Copiar Riot ID">
+                                <i class="bi bi-clipboard" id="copy-icon"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="badge bg-secondary text-uppercase p-2 mb-4 fs-6" style="letter-spacing: 1px;">
                         Rango: <span class="text-info">{{ user_data.rango|default:"Unranked" }}</span>
                     </div>
 
@@ -35,7 +54,6 @@
                             <i class="bi bi-pencil-square me-2"></i> EDITAR PERFIL
                         </a>
                     {% endif %}
-                    
                 </div>
             </div>
         </div>
@@ -46,13 +64,16 @@
                     <h5 class="text-info mb-0 fw-bold"><i class="bi bi-card-text me-2"></i> Detalles del Agente</h5>
                 </div>
                 <div class="card-body">
+                    
                     <div class="mb-4">
                         <h6 class="text-secondary text-uppercase small fw-bold">Sobre mí</h6>
                         <p class="lead fs-6" style="color: #ece8e1;">
                             {{ user_data.bio|default:"Este agente mantiene su información clasificada." }}
                         </p>
                     </div>
+
                     <hr class="border-secondary">
+
                     <div class="row mt-4">
                         <div class="col-md-6 mb-3">
                             <div class="p-3 rounded border border-secondary" style="background-color: rgba(255,255,255,0.05);">
@@ -63,6 +84,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-6 mb-3">
                             <div class="p-3 rounded border border-secondary" style="background-color: rgba(255,255,255,0.05);">
                                 <h6 class="text-secondary text-uppercase small fw-bold mb-1">Miembro Desde</h6>
@@ -73,9 +95,36 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
+        
     </div>
 </div>
+<script>
+    function copyRiotId() {
+        // 1. Obtenemos el texto del Riot ID
+        const riotIdText = document.getElementById('riot-id-text').innerText;
+        const icon = document.getElementById('copy-icon');
+
+        // 2. Usamos la API del portapapeles del navegador
+        navigator.clipboard.writeText(riotIdText).then(() => {
+            
+            // 3. Feedback Visual: Cambiar icono a 'Check' (éxito)
+            icon.classList.remove('bi-clipboard');
+            icon.classList.add('bi-check-lg');
+            
+            // 4. Volver al icono original después de 2 segundos
+            setTimeout(() => {
+                icon.classList.remove('bi-check-lg');
+                icon.classList.add('bi-clipboard');
+            }, 2000);
+
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+            alert('No se pudo copiar automáticamente. Inténtalo manual.');
+        });
+    }
+</script>
 {% endblock %}
