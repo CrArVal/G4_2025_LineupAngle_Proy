@@ -1,0 +1,91 @@
+{% extends 'base/menu.html' %}
+{% load static %}
+
+{% block content %}
+<div style="height: 100px;"></div>
+
+<div class="container">
+    <a href="{% url 'comunidad' %}" class="text-decoration-none text-muted mb-3 d-inline-block">
+        <i class="bi bi-arrow-left"></i> Volver a la lista
+    </a>
+
+    <div class="card bg-dark text-white border-info shadow-lg">
+        <div class="card-header border-secondary p-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="badge bg-info text-dark mb-2">LOBBY ACTIVO</span>
+                    <h1 class="display-6 fw-bold text-white m-0">{{ grupo.titulo }}</h1>
+                    <p class="text-info mt-1 mb-0">
+                        {{ grupo.region }} - {{ grupo.servidor }} | Rango: {{ grupo.rango_min }}
+                    </p>
+                </div>
+                <div class="text-end">
+                    <h2 class="fw-bold">{{ grupo.cupos_actuales }}/{{ grupo.cupos_max }}</h2>
+                    <small class="text-muted">JUGADORES</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-5 text-center">
+            <div class="d-flex justify-content-center gap-3 mb-5">
+                {% for i in "x"|rjust:grupo.cupos_actuales %}
+                    <div class="rounded-circle bg-info d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border: 2px solid white;">
+                        <i class="bi bi-person-fill fs-3 text-dark"></i>
+                    </div>
+                {% endfor %}
+                {% for i in "x"|rjust:5 %} 
+                    {% if forloop.counter > grupo.cupos_actuales %}
+                    <div class="rounded-circle border border-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; opacity: 0.3;">
+                        <i class="bi bi-person fs-3"></i>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-center gap-3">
+                {% if grupo.host_uid == user.username %}
+                    <div class="alert alert-dark border-info mb-0 d-flex align-items-center px-3">
+                        <i class="bi bi-star-fill text-warning me-2"></i> Eres el líder.
+                    </div>
+                    
+                    <form action="{% url 'eliminar_grupo' grupo_id=grupo.id %}" method="POST" 
+                          onsubmit="return confirm('¿Estás seguro de que quieres borrar esta sala permanentemente?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold">
+                            <i class="bi bi-trash-fill"></i> Disolver Grupo
+                        </button>
+                    </form>               
+                
+
+                {% elif user.username in grupo.miembros %}
+                    <div class="alert alert-success bg-opacity-10 border-success mb-0 text-white">
+                        <i class="bi bi-check-circle-fill"></i> Ya estás dentro.
+                    </div>
+                    <a href="{% url 'salir_grupo' grupo_id=grupo.id %}" class="btn btn-outline-warning btn-lg fw-bold">
+                        Salir del Grupo
+                    </a>
+
+                {% elif grupo.cupos_actuales < grupo.cupos_max %}
+                    <a href="{% url 'unirse_grupo' grupo_id=grupo.id %}" class="btn btn-info btn-lg fw-bold px-5">
+                        ¡UNIRSE AHORA!
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary btn-lg" disabled>Grupo Lleno</button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card-footer border-secondary bg-transparent text-center py-3">
+            <small class="text-muted">Únete para ver el chat del grupo y coordinar.</small>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-effect:hover {
+        transform: translateY(-3px);
+        border-color: var(--acento-principal) !important;
+        transition: all 0.2s;
+    }
+</style>
+{% endblock %}

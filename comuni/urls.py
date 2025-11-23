@@ -23,4 +23,15 @@ urlpatterns = [
 
     path('ajustes/password/', views.change_password_view, name='change_password'),
 
+    path('comunidad/', views.comunidad_view, name='comunidad'), # PÁGINA 1
+    path('comunidad/crear/', views.crear_grupo_view, name='crear_grupo'),
+    
+   
+    path('comunidad/lobby/<str:grupo_id>/', views.grupo_detalle_view, name='grupo_detalle'),
+
+    
+    path('comunidad/eliminar/<str:grupo_id>/', views.eliminar_grupo, name='eliminar_grupo'),
+    path('comunidad/salir/<str:grupo_id>/', views.salir_grupo, name='salir_grupo'),
+    path('comunidad/unirse/<str:grupo_id>/', views.unirse_grupo, name='unirse_grupo'),
+
 ]

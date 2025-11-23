@@ -1,0 +1,94 @@
+{% load static %}
+
+<div class="modal fade" id="crearGrupoModal" tabindex="-1" aria-labelledby="crearGrupoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-secondary shadow-lg">
+      
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title fw-bold text-info" id="crearGrupoModalLabel">
+            <i class="bi bi-plus-circle me-2"></i>Crear Nueva Sesión
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form action="{% url 'crear_grupo' %}" method="POST">
+          {% csrf_token %}
+          
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label class="form-label fw-bold text-secondary small">TÍTULO DE LA SESIÓN</label>
+                  <input type="text" name="titulo" class="form-control bg-dark text-white border-secondary" 
+                         placeholder="Ej: Rankeds tryhard ORO/PLAT" required>
+              </div>
+
+              <div class="row g-3">
+                  <div class="col-md-6">
+                      <label class="form-label fw-bold text-secondary small">REGIÓN</label>
+                      <select name="region" id="modal_region" class="form-select bg-dark text-white border-secondary" required>
+                          <option value="" selected disabled>Selecciona...</option>
+                          {% for region in regiones %}
+                            <option value="{{region}}">{{region}}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                   
+                  <div class="col-md-6">
+                      <label class="form-label fw-bold text-secondary small">SERVIDOR</label>
+                      <select name="servidor" id="modal_servidor" class="form-select bg-dark text-white border-secondary" required>
+                          <option value="" selected disabled>Elige Región primero</option>
+                      </select>
+                  </div>
+
+                  <div class="col-md-12">
+                       <label class="form-label fw-bold text-secondary small">RANGO MÍNIMO</label>
+                      <select name="rango" class="form-select bg-dark text-white border-secondary" required>
+                          {% for rango in rangos %}
+                            <option value="{{rango}}">{{rango}}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+              </div>
+          </div>
+
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-info fw-bold text-dark">Publicar Sesión</button>
+          </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const regionSelect = document.getElementById('modal_region');
+    const serverSelect = document.getElementById('modal_servidor');
+
+    // La misma data que usamos en el perfil
+    const serversData = {
+        'NA': ['US East (N. Virginia)', 'US West (N. California)', 'US Central (Illinois)', 'US Texas', 'US West (Oregon)'],
+        'LATAM': ['Santiago', 'Mexico City', 'Miami', 'Bogota'],
+        'BR': ['Sao Paulo'],
+        'EU': ['Frankfurt', 'Paris', 'London', 'Madrid', 'Warsaw', 'Istanbul'],
+        'KR': ['Seoul'],
+        'AP': ['Tokyo', 'Singapore', 'Sydney', 'Mumbai']
+    };
+
+    regionSelect.addEventListener('change', function() {
+        const selectedRegion = this.value;
+        
+        // Limpiar lista actual
+        serverSelect.innerHTML = '<option value="" selected disabled>Selecciona Servidor</option>';
+
+        if (selectedRegion && serversData[selectedRegion]) {
+            serversData[selectedRegion].forEach(server => {
+                const option = document.createElement('option');
+                option.value = server;
+                option.textContent = server;
+                serverSelect.appendChild(option);
+            });
+        }
+    });
+});
+</script>

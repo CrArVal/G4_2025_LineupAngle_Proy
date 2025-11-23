@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from firebase_admin import firestore
 from django.contrib.auth.models import User
+import datetime
 
 
 def login(request):
@@ -202,3 +203,120 @@ def forgot_password_view(request):
 @login_required
 def change_password_view(request):
     return render(request, 'comuni/change_password.html')
+
+@login_required
+def comunidad_view(request):
+    grupos_ref = db.collection('lfg_groups')
+    query = grupos_ref.where('estado', '==', 'abierto').order_by('creado_el', direction=firestore.Query.DESCENDING)
+    results = query.stream()
+
+    lista_grupos = []
+    for doc in results:
+        data = doc.to_dict()
+        data['id'] = doc.id
+        lista_grupos.append(data)
+
+    context = {
+        'grupos': lista_grupos,
+        'rangos': ['Hierro', 'Bronce', 'Plata', 'Oro', 'Platino', 'Diamante', 'Ascendente', 'Inmortal'],
+        'regiones': ['LATAM', 'BR', 'NA', 'EU'],
+        'servidores': ['Santiago', 'Mexico City', 'Miami', 'Sao Paulo']
+    }
+    return render(request, 'comuni/comunidad_lista.html', context) # Nota el cambio de nombre del template
+
+# --- PÁGINA 2: LOBBY DEL GRUPO ---
+@login_required
+def grupo_detalle_view(request, grupo_id):
+    doc_ref = db.collection('lfg_groups').document(grupo_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        messages.error(request, "Ese grupo ya no existe.")
+        return redirect('comunidad')
+
+    grupo_data = doc.to_dict()
+    grupo_data['id'] = doc.id
+
+    return render(request, 'comuni/grupo_lobby.html', {'grupo': grupo_data})
+
+# --- ACCIONES ACTUALIZADAS (Redirecciones) ---
+
+@login_required
+def unirse_grupo(request, grupo_id):
+    # ... (Tu lógica de unirse igual que antes) ...
+    # ... (código de firebase update) ...
+    
+    # 🚨 CAMBIO: Al unirse, te lleva ADENTRO del lobby
+    return redirect('grupo_detalle', grupo_id=grupo_id)
+
+@login_required
+def salir_grupo(request, grupo_id):
+    # ... (Tu lógica de salir/eliminar igual que antes) ...
+    
+    # 🚨 CAMBIO: Al salir, te devuelve a la LISTA
+    return redirect('comunidad')
+
+@login_required
+def eliminar_grupo(request, grupo_id):
+    # Solo permitimos POST para acciones destructivas (Seguridad)
+    if request.method == 'POST':
+        uid_usuario = request.user.username
+        
+        # Referencia al documento
+        doc_ref = db.collection('lfg_groups').document(grupo_id)
+        doc = doc_ref.get()
+
+        if doc.exists:
+            data = doc.to_dict()
+            host_real = data.get('host_uid')
+            
+            # --- DEBUG (Mira esto en tu terminal negra) ---
+            print(f"Usuario intentando borrar: {uid_usuario}")
+            print(f"Dueño real del grupo: {host_real}")
+            # ---------------------------------------------
+
+            # Verificar si es el Host
+            if host_real == uid_usuario:
+                doc_ref.delete()
+                messages.success(request, 'Grupo eliminado correctamente.')
+            else:
+                messages.error(request, 'No tienes permiso. No eres el líder.')
+        else:
+            messages.error(request, 'El grupo no existe o ya fue borrado.')
+    
+    return redirect('comunidad')
+@login_required
+def crear_grupo_view(request):
+    if request.method == 'POST':
+        uid_creador = request.user.username 
+
+        # Recopilar datos del formulario
+        nuevo_grupo = {
+            'titulo': request.POST.get('titulo'),
+            'host_uid': uid_creador,
+            'region': request.POST.get('region'),
+            'servidor': request.POST.get('servidor'),
+            'rango_min': request.POST.get('rango'),
+            'miembros': [uid_creador], # El creador entra automáticamente
+            'cupos_max': 5,
+            'cupos_actuales': 1,
+            'codigo_party': '', # Se puede llenar después en el lobby
+            'creado_el': datetime.datetime.now(),
+            'estado': 'abierto'
+        }
+
+        try:
+            # Guardar en Firebase y OBTENER LA REFERENCIA (para saber el ID nuevo)
+            update_time, group_ref = db.collection('lfg_groups').add(nuevo_grupo)
+            
+            messages.success(request, '¡Sesión creada con éxito!')
+            
+            # 🚀 MEJORA DE UX: Redirigir directamente al Lobby del grupo creado
+            return redirect('grupo_detalle', grupo_id=group_ref.id)
+
+        except Exception as e:
+            messages.error(request, f'Error al crear la sesión: {e}')
+            return redirect('comunidad')
+    
+    # Si no es POST, volver a la lista
+    return redirect('comunidad')
