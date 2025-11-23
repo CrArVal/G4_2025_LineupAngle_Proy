@@ -15,11 +15,11 @@
                     </h2>
                     <br>
                     <div class="position-relative mb-3">
-                        <img src="{% static 'images/mascotasin.png' %}" 
-                             alt="Avatar" 
-                             class="rounded-circle border border-3 border-danger p-1" 
-                             style="width: 150px; height: 150px; object-fit: cover; background-color: #212529;">
-                        
+                        <img src="{% static 'images/avatars/' %}{{ user_data.avatar|default:'default.png' }}" 
+                            alt="Avatar" 
+                            class="rounded-circle border border-3 border-danger p-1" 
+                            style="width: 150px; height: 150px; object-fit: cover; background-color: #212529;">
+    
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info text-dark">
                             {{ user_data.region|default:"N/A" }}
                         </span>

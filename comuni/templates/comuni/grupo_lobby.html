@@ -4,12 +4,13 @@
 {% block content %}
 <div style="height: 100px;"></div>
 
-<div class="container">
+<div class="container mb-5">
     <a href="{% url 'comunidad' %}" class="text-decoration-none text-muted mb-3 d-inline-block">
         <i class="bi bi-arrow-left"></i> Volver a la lista
     </a>
 
     <div class="card bg-dark text-white border-info shadow-lg">
+        
         <div class="card-header border-secondary p-4">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -27,65 +28,266 @@
         </div>
 
         <div class="card-body p-5 text-center">
-            <div class="d-flex justify-content-center gap-3 mb-5">
-                {% for i in "x"|rjust:grupo.cupos_actuales %}
-                    <div class="rounded-circle bg-info d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border: 2px solid white;">
-                        <i class="bi bi-person-fill fs-3 text-dark"></i>
+            
+            <div class="d-flex justify-content-center flex-wrap gap-4 mb-5">
+                
+                {% for miembro in miembros_detalles %}
+                    <div class="d-flex flex-column align-items-center" style="width: 120px;">
+                        <span class="fw-bold text-white mb-2 text-truncate w-100" title="{{ miembro.nombre }}">
+                            {{ miembro.nombre }}
+                        </span>
+                        <div class="rounded-circle bg-info d-flex align-items-center justify-content-center mb-2 shadow" 
+                             style="width: 60px; height: 60px; border: 3px solid #1a2332;">
+                            <i class="bi bi-person-fill fs-2 text-dark"></i>
+                        </div>
+                        <div class="badge bg-secondary text-info w-100 text-truncate">
+                            {{ miembro.riot_id }}
+                        </div>
                     </div>
                 {% endfor %}
+
                 {% for i in "x"|rjust:5 %} 
                     {% if forloop.counter > grupo.cupos_actuales %}
-                    <div class="rounded-circle border border-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; opacity: 0.3;">
-                        <i class="bi bi-person fs-3"></i>
+                    <div class="d-flex flex-column align-items-center opacity-25" style="width: 120px;">
+                        <span class="mb-2 text-muted">Vacío</span>
+                        <div class="rounded-circle border border-secondary d-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                            <i class="bi bi-person fs-3"></i>
+                        </div>
+                        <div class="badge border border-secondary text-muted w-100">--</div>
                     </div>
                     {% endif %}
                 {% endfor %}
             </div>
 
-            <div class="d-flex justify-content-center gap-3">
-                {% if grupo.host_uid == user.username %}
-                    <div class="alert alert-dark border-info mb-0 d-flex align-items-center px-3">
-                        <i class="bi bi-star-fill text-warning me-2"></i> Eres el líder.
-                    </div>
+            <hr class="border-secondary my-4">
+
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-6">
                     
-                    <form action="{% url 'eliminar_grupo' grupo_id=grupo.id %}" method="POST" 
-                          onsubmit="return confirm('¿Estás seguro de que quieres borrar esta sala permanentemente?');">
+                    {% if grupo.host_uid == user.username %}
+                        <div class="card border-warning bg-transparent">
+                            <div class="card-body">
+                                <label class="form-label text-warning fw-bold mb-2">
+                                    <i class="bi bi-key-fill"></i> CÓDIGO DE PARTIDA (Solo tú editas)
+                                </label>
+                                <form action="{% url 'actualizar_codigo' grupo_id=grupo.id %}" method="POST" class="d-flex gap-2">
+                                    {% csrf_token %}
+                                    <input type="text" name="codigo_party" class="form-control bg-dark text-white border-secondary text-center fw-bold" 
+                                           value="{{ grupo.codigo_party|default:'' }}" 
+                                           placeholder="Pega el código de Valorant aquí">
+                                    <button type="submit" class="btn btn-warning fw-bold">Guardar</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    {% elif user.username in grupo.miembros %}
+                        <div class="card border-success bg-transparent">
+                            <div class="card-body">
+                                <label class="form-label text-success fw-bold mb-2">
+                                    <i class="bi bi-controller"></i> CÓDIGO DE PARTIDA
+                                </label>
+                                {% if grupo.codigo_party %}
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-dark text-white border-success text-center fw-bold" 
+                                               value="{{ grupo.codigo_party }}" readonly id="partyCodeInput">
+                                        <button class="btn btn-success" onclick="copiarCodigo()">
+                                            <i class="bi bi-clipboard"></i> Copiar
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-secondary mb-0 border-0 bg-dark text-muted">
+                                        Esperando que el líder ponga el código...
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                {% if grupo.host_uid == user.username %}
+                    <form action="{% url 'eliminar_grupo' grupo_id=grupo.id %}" method="POST" onsubmit="return confirm('¿Borrar sala permanentemente?');">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-lg fw-bold">
-                            <i class="bi bi-trash-fill"></i> Disolver Grupo
-                        </button>
-                    </form>               
-                
-
+                        <button class="btn btn-danger btn-lg fw-bold"><i class="bi bi-trash-fill"></i> Disolver Grupo</button>
+                    </form>
                 {% elif user.username in grupo.miembros %}
-                    <div class="alert alert-success bg-opacity-10 border-success mb-0 text-white">
-                        <i class="bi bi-check-circle-fill"></i> Ya estás dentro.
-                    </div>
-                    <a href="{% url 'salir_grupo' grupo_id=grupo.id %}" class="btn btn-outline-warning btn-lg fw-bold">
-                        Salir del Grupo
-                    </a>
-
+                    <a href="{% url 'salir_grupo' grupo_id=grupo.id %}" class="btn btn-outline-warning btn-lg fw-bold">Salir del Grupo</a>
                 {% elif grupo.cupos_actuales < grupo.cupos_max %}
-                    <a href="{% url 'unirse_grupo' grupo_id=grupo.id %}" class="btn btn-info btn-lg fw-bold px-5">
-                        ¡UNIRSE AHORA!
-                    </a>
+                    <a href="{% url 'unirse_grupo' grupo_id=grupo.id %}" class="btn btn-info btn-lg fw-bold px-5">¡UNIRSE AHORA!</a>
                 {% else %}
                     <button class="btn btn-secondary btn-lg" disabled>Grupo Lleno</button>
                 {% endif %}
             </div>
-        </div>
-        
-        <div class="card-footer border-secondary bg-transparent text-center py-3">
-            <small class="text-muted">Únete para ver el chat del grupo y coordinar.</small>
+
         </div>
     </div>
+    
+    {% if user.username in grupo.miembros %}
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-header border-secondary d-flex justify-content-between align-items-center" style="background-color: #1a2332;">
+                    <h5 class="text-white m-0"><i class="bi bi-chat-dots-fill text-info me-2"></i>Chat de Equipo</h5>
+                    <span class="badge bg-success small">En vivo</span>
+                </div>
+                
+                <div id="chat-box" class="card-body p-3" style="height: 300px; overflow-y: auto; background-color: #0f151a;">
+                    <div class="text-center text-muted mt-5"><small>Cargando chat...</small></div>
+                </div>
+
+                <div class="card-footer border-secondary bg-transparent p-2">
+                    <form id="chatForm" class="d-flex gap-2">
+                        <input type="text" id="messageInput" class="form-control bg-dark text-white border-secondary" 
+                               placeholder="Escribe un mensaje..." autocomplete="off" required>
+                        <button type="submit" class="btn btn-info fw-bold"><i class="bi bi-send-fill"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 
-<style>
-    .hover-effect:hover {
-        transform: translateY(-3px);
-        border-color: var(--acento-principal) !important;
-        transition: all 0.2s;
+<script>
+    // Función simple para copiar código
+    function copiarCodigo() {
+        var copyText = document.getElementById("partyCodeInput");
+        copyText.select();
+        navigator.clipboard.writeText(copyText.value);
+        alert("Código copiado al portapapeles");
     }
+</script>
+
+{% if user.username in grupo.miembros %}
+<script type="module">
+    // 1. IMPORTACIONES (Asegúrate de tener 'doc' y 'getDoc' aquí)
+    import { getFirestore, collection, doc, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // Inicializar
+    const app = getApps()[0]; 
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Variables
+    const grupoId = "{{ grupo.id }}";
+    const currentUserIdDjango = "{{ user.username }}"; 
+    
+    // Variables para el chat
+    const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chatForm');
+    const messageInput = document.getElementById('messageInput');
+
+    // ============================================================
+    // 🚨 NUEVO: VIGILANTE DEL GRUPO (Auto-recarga y Auto-salida)
+    // ============================================================
+    const groupDocRef = doc(db, "lfg_groups", grupoId);
+    
+    // Variable para evitar que la página se recargue apenas entras
+    let isFirstLoad = true; 
+
+    // Escuchamos cambios en el DOCUMENTO del grupo (no solo el chat)
+    onSnapshot(groupDocRef, (docSnap) => {
+        
+        // CASO 1: El grupo fue eliminado (Disuelto por el líder)
+        if (!docSnap.exists()) {
+            alert("El líder ha disuelto el grupo o se ha cerrado.");
+            window.location.href = "{% url 'comunidad' %}"; // Te devuelve a la lista
+            return;
+        }
+
+        // CASO 2: Alguien entró o salió (Cambio de datos)
+        if (isFirstLoad) {
+            // La primera vez que se ejecuta es al abrir la página.
+            // No hacemos nada, solo marcamos que ya cargó.
+            isFirstLoad = false;
+        } else {
+            // Si esta función se ejecuta DE NUEVO, es porque algo cambió en la base de datos.
+            // Recargamos la página para actualizar la lista de miembros y los botones.
+            console.log("Cambio detectado en el grupo. Actualizando...");
+            window.location.reload();
+        }
+    });
+    // ============================================================
+
+
+    // --- AQUI SIGUE TU LÓGICA DE CHAT (IGUAL QUE ANTES) ---
+    const messagesRef = collection(db, "lfg_groups", grupoId, "messages");
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+    onSnapshot(q, (snapshot) => {
+        // ... (Tu código del chat se mantiene igual) ...
+        chatBox.innerHTML = ""; 
+        if (snapshot.empty) {
+            chatBox.innerHTML = '<div class="text-center text-muted mt-5"><small>¡Di hola al equipo! 👋</small></div>';
+        }
+        snapshot.forEach((doc) => {
+            const msg = doc.data();
+            const isMe = msg.uid === currentUserIdDjango;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isMe ? 'message-own' : 'message-other';
+            msgDiv.innerHTML = `
+                ${!isMe ? `<span class="sender-name">${msg.sender}</span>` : ''}
+                <div class="bubble">${msg.text}</div>
+            `;
+            chatBox.appendChild(msgDiv);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    chatForm.addEventListener('submit', async (e) => {
+        // ... (Tu código de enviar mensaje se mantiene igual) ...
+        e.preventDefault();
+        const text = messageInput.value.trim();
+        const currentUser = auth.currentUser; 
+
+        if (!text || !currentUser) return;
+
+        try {
+            await addDoc(messagesRef, {
+                text: text,
+                sender: "{{ user.first_name|default:user.username }}",
+                uid: currentUser.uid,
+                timestamp: serverTimestamp()
+            });
+            messageInput.value = ""; 
+        } catch (error) {
+            console.error("Error enviando mensaje:", error);
+        }
+    });
+
+</script>
+{% endif %}
+
+<style>
+    .message-own { text-align: right; margin-bottom: 10px; }
+    .message-own .bubble {
+        background-color: var(--acento-principal); /* Cian */
+        color: #0f1923;
+        padding: 8px 12px;
+        border-radius: 15px 15px 0 15px;
+        display: inline-block;
+        text-align: left;
+        font-weight: 600;
+        max-width: 80%;
+    }
+
+    .message-other { text-align: left; margin-bottom: 10px; }
+    .message-other .bubble {
+        background-color: #2a3a50;
+        color: #e0e0e0;
+        padding: 8px 12px;
+        border-radius: 15px 15px 15px 0;
+        display: inline-block;
+        max-width: 80%;
+    }
+
+    .sender-name { font-size: 0.7rem; color: #888; margin-bottom: 2px; display: block; }
 </style>
+
 {% endblock %}

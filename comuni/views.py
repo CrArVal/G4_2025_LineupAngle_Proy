@@ -70,37 +70,38 @@ def status_view(request):
 db = firestore.client()
 @login_required
 def editar_perfil_firebase(request):
-    # Usamos el UID de Firebase como identificador (guardado en username)
     uid = request.user.username
     user_doc_ref = db.collection('users').document(uid)
 
+    # 1. DEFINIR TUS ICONOS DISPONIBLES (Nombres de archivo exactos)
+    lista_avatares = [
+        'jett.png', 'phoenix.png', 'sage.png', 'reyna.png', 
+        'omen.png', 'sova.png', 'default.png'
+    ]
+
     if request.method == 'POST':
-        # --- LÓGICA DE GUARDADO NO DESTRUCTIVA ---
         datos_a_actualizar = {}
-        
-        # Lista de campos que esperamos del formulario
-        campos_posibles = ['riot_id', 'rango', 'region', 'servidor', 'bio']
+        # Agregamos 'avatar' a la lista de campos permitidos
+        campos_posibles = ['riot_id', 'rango', 'region', 'servidor', 'bio', 'avatar']
         
         for campo in campos_posibles:
             valor = request.POST.get(campo)
-            # Solo guardamos si el valor no está vacío
             if valor and valor.strip() != "":
                 datos_a_actualizar[campo] = valor
 
         if datos_a_actualizar:
-            # merge=True es la clave: actualiza sin borrar lo que no envíes
             user_doc_ref.set(datos_a_actualizar, merge=True)
-            messages.success(request, '¡Perfil actualizado correctamente!')
+            messages.success(request, '¡Perfil actualizado!')
         
-        return redirect('home') 
+        return redirect('home')
 
     else:
-        # --- CARGAR DATOS PARA MOSTRAR ---
         doc = user_doc_ref.get()
         user_data = doc.to_dict() if doc.exists else {}
 
     context = {
         'user_data': user_data,
+        'avatares': lista_avatares, # 2. Enviamos la lista al HTML
         'rangos': [
             'Unranked', 'Hierro', 'Bronce', 'Plata', 'Oro', 
             'Platino', 'Diamante', 'Ascendente', 'Inmortal', 'Radiante'
@@ -108,7 +109,6 @@ def editar_perfil_firebase(request):
         'regiones': ['NA', 'LATAM', 'BR', 'EU', 'KR', 'AP'],
     }
     
-    # Nota la ruta: 'comuni/profile_edit.html'
     return render(request, 'comuni/profile_edit.html', context)
 
 
@@ -224,7 +224,6 @@ def comunidad_view(request):
     }
     return render(request, 'comuni/comunidad_lista.html', context) # Nota el cambio de nombre del template
 
-# --- PÁGINA 2: LOBBY DEL GRUPO ---
 @login_required
 def grupo_detalle_view(request, grupo_id):
     doc_ref = db.collection('lfg_groups').document(grupo_id)
@@ -236,24 +235,139 @@ def grupo_detalle_view(request, grupo_id):
 
     grupo_data = doc.to_dict()
     grupo_data['id'] = doc.id
+    
+    # --- 🧠 LÓGICA NUEVA: ENRIQUECER MIEMBROS ---
+    # Recuperamos los datos reales (Nombre, Riot ID) de cada miembro en Firestore
+    miembros_detalles = []
+    lista_uids = grupo_data.get('miembros', [])
+    
+    for uid in lista_uids:
+        # Consultamos la colección 'users' para este UID
+        user_profile = db.collection('users').document(uid).get()
+        
+        if user_profile.exists:
+            p_data = user_profile.to_dict()
+            # Intentamos obtener el nombre de Django si es posible, o usamos un default
+            try:
+                user_obj = User.objects.get(username=uid)
+                nombre_web = user_obj.first_name or user_obj.username
+            except:
+                nombre_web = "Usuario"
 
-    return render(request, 'comuni/grupo_lobby.html', {'grupo': grupo_data})
+            miembros_detalles.append({
+                'uid': uid,
+                'nombre': nombre_web, # Nombre en la web
+                'riot_id': p_data.get('riot_id', 'Sin Riot ID'), # Riot ID
+                'rango': p_data.get('rango', 'Unranked')
+            })
+        else:
+            # Si no tiene perfil configurado
+            miembros_detalles.append({
+                'uid': uid,
+                'nombre': 'Agente Desconocido',
+                'riot_id': '--',
+                'rango': 'Unranked'
+            })
 
+    return render(request, 'comuni/grupo_lobby.html', {
+        'grupo': grupo_data,
+        'miembros_detalles': miembros_detalles # Pasamos la lista con datos
+    })
+
+# --- 🆕 NUEVA VISTA: ACTUALIZAR CÓDIGO DE PARTIDA ---
+@login_required
+def actualizar_codigo(request, grupo_id):
+    if request.method == 'POST':
+        nuevo_codigo = request.POST.get('codigo_party')
+        doc_ref = db.collection('lfg_groups').document(grupo_id)
+        
+        # Verificar que sea el host antes de editar
+        doc = doc_ref.get()
+        if doc.exists and doc.to_dict().get('host_uid') == request.user.username:
+            doc_ref.update({'codigo_party': nuevo_codigo})
+            messages.success(request, 'Código de partida actualizado.')
+        else:
+            messages.error(request, 'No tienes permiso para editar el código.')
+            
+    return redirect('grupo_detalle', grupo_id=grupo_id)
 # --- ACCIONES ACTUALIZADAS (Redirecciones) ---
 
 @login_required
 def unirse_grupo(request, grupo_id):
-    # ... (Tu lógica de unirse igual que antes) ...
-    # ... (código de firebase update) ...
+    uid_usuario = request.user.username # Tu UID es el username en Django
     
-    # 🚨 CAMBIO: Al unirse, te lleva ADENTRO del lobby
+    # 1. Obtener referencia al documento en Firebase
+    doc_ref = db.collection('lfg_groups').document(grupo_id)
+    doc = doc_ref.get()
+    
+    if doc.exists:
+        data = doc.to_dict()
+        miembros = data.get('miembros', [])
+        cupos_max = int(data.get('cupos_max', 5))
+        
+        # 2. Validaciones antes de unir
+        if uid_usuario in miembros:
+            messages.warning(request, 'Ya eres parte de este grupo.')
+        elif len(miembros) >= cupos_max:
+            messages.error(request, 'El grupo ya está lleno.')
+        else:
+            # 3. Agregar usuario y actualizar
+            miembros.append(uid_usuario)
+            
+            doc_ref.update({
+                'miembros': miembros,
+                'cupos_actuales': len(miembros) # Actualizamos el contador
+            })
+            messages.success(request, '¡Te has unido a la escuadra!')
+            
+    else:
+        messages.error(request, 'El grupo que buscas ya no existe.')
+        return redirect('comunidad')
+
+    # 🚨 REDIRECCIÓN: Te lleva ADENTRO del lobby
     return redirect('grupo_detalle', grupo_id=grupo_id)
 
+
+# ==========================================================
+# 🚪 SALIR DEL GRUPO
+# ==========================================================
 @login_required
 def salir_grupo(request, grupo_id):
-    # ... (Tu lógica de salir/eliminar igual que antes) ...
+    uid_usuario = request.user.username
     
-    # 🚨 CAMBIO: Al salir, te devuelve a la LISTA
+    # 1. Obtener referencia
+    doc_ref = db.collection('lfg_groups').document(grupo_id)
+    doc = doc_ref.get()
+
+    if doc.exists:
+        data = doc.to_dict()
+        miembros = data.get('miembros', [])
+        host_uid = data.get('host_uid')
+
+        # Solo procesamos si el usuario realmente está en la lista
+        if uid_usuario in miembros:
+            
+            # CASO A: El líder se sale -> Se disuelve el grupo
+            if uid_usuario == host_uid:
+                doc_ref.delete()
+                messages.info(request, 'El grupo se ha eliminado porque eras el líder.')
+            
+            # CASO B: Un miembro normal se sale
+            else:
+                miembros.remove(uid_usuario) # Lo sacamos de la lista
+                
+                # Verificación de limpieza: Si el grupo queda vacío, lo borramos
+                if len(miembros) == 0:
+                    doc_ref.delete()
+                else:
+                    # Si queda gente, actualizamos la lista y el contador
+                    doc_ref.update({
+                        'miembros': miembros,
+                        'cupos_actuales': len(miembros)
+                    })
+                messages.success(request, 'Has salido del grupo.')
+
+    # 🚨 REDIRECCIÓN: Te devuelve a la LISTA general
     return redirect('comunidad')
 
 @login_required

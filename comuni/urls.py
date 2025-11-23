@@ -28,7 +28,7 @@ urlpatterns = [
     
    
     path('comunidad/lobby/<str:grupo_id>/', views.grupo_detalle_view, name='grupo_detalle'),
-
+    path('comunidad/codigo/<str:grupo_id>/', views.actualizar_codigo, name='actualizar_codigo'),
     
     path('comunidad/eliminar/<str:grupo_id>/', views.eliminar_grupo, name='eliminar_grupo'),
     path('comunidad/salir/<str:grupo_id>/', views.salir_grupo, name='salir_grupo'),
