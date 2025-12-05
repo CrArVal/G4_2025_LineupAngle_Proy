@@ -16,7 +16,7 @@
                 <p class="lead text-secondary-accent mb-4">Guías claras para nuevos, lineups para intermedios y un LFG con chat en tiempo real.</p>
                 
                 <a href="{% url 'lineuphome' %}" class="btn btn-danger btn-lg me-3" style="background-color: #FF4655; border-color: #FF4655;">Ver lineups</a>
-                <button class="btn btn-outline-info btn-lg" style="border-color: #07F0F0; color: #07F0F0;">Buscar equipo</button>
+                <a href="{% url 'comunidad' %}" class="btn btn-outline-info btn-lg" style="border-color: #07F0F0; color: #07F0F0;">Buscar equipo</a>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
 
                     <a href="{% url 'noticias' %}" class="shortcut-link medium-surface"><i class="fas fa-newspaper me-2"></i> NOTICIAS</a>
                     
-                    <a href="#" class="shortcut-link dark-surface"><i class="fas fa-calendar-alt me-2"></i> CALENDARIO</a>
+                    <a href="{% url 'comunidad' %}" class="shortcut-link dark-surface"><i class="fas fa-comments me-2"></i> COMUNIDAD</a>
                     
                 </div>
             </div>
@@ -53,7 +53,7 @@
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex gap-2 p-0 pt-3">
                     <a href="{% url 'weapons_page' %}" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Ir a armas</a>
-                    <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Guardar</button>
+                    <a href="{% url 'weapons_page' %}" class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Detalles</a>
                 </div>
             </div>
         </div>
@@ -62,11 +62,11 @@
             <div class="surface-card h-100 p-3">
                 <div class="card-body">
                     <h3 class="h5 fw-bold text-white">Lineup: Viper - Ascent A</h3>
-                    <p class="card-text small text-secondary-accent">La estrategia con Viper para asegurar el sitio A en Ascent.</p>
+                    <p class="card-text small text-secondary-accent">La estrategia de lineups con Viper para asegurar el sitio A en Ascent.</p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex gap-2 p-0 pt-3">
                     <a href="{% url 'viperlineup' %}" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Ver lineup</a>
-                    <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Mas lineup de Viper</button>
+                    <a href="{% url 'viperlineup' %}" class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Mas lineup de Viper</a>
                 </div>
             </div>
         </div>
@@ -78,8 +78,8 @@
                     <p class="card-text small text-secondary-accent">Únete a nuestro chat exclusivo y encuentra compañeros de tu nivel.</p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex gap-2 p-0 pt-3">
-                    <button class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Unirse al Chat</button>
-                    <button class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Ver mas grupos</button>
+                    <a href="{% url 'comunidad' %}" class="btn btn-danger btn-sm" style="background-color: #FF4655; border-color: #FF4655;">Unirse al Chat</a>
+                    <a href="{% url 'comunidad' %}"class="btn btn-outline-info btn-sm" style="border-color: #07F0F0; color: #07F0F0;">Ver mas grupos</a>
                 </div>
             </div>
         </div>
@@ -91,32 +91,32 @@
 
                 <div class="d-flex flex-wrap justify-content-center flex-md-nowrap justify-content-md-start overflow-auto pb-3 gap-3 scrollable-container mx-auto" style="max-width: fit-content;">
                     
-                    <a href="#" class="agent-box-v2 text-decoration-none">
+                    <a href="{% url 'agents_page' %}" class="agent-box-v2 text-decoration-none">
                         <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/08b3d8822544bd327ebed0768c8b90fcec83d1a5-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Sova" class="agent-img">
                         <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Sova</h5><p class="text-secondary-accent small mb-0">Iniciador</p></div>
                     </a>
                     
-                    <a href="#" class="agent-box-v2 text-decoration-none">
+                    <a href="{% url 'agents_page' %}" class="agent-box-v2 text-decoration-none">
                         <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/152244f121e61ca32bdd2bea9fc5370e315664fb-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Fade" class="agent-img">
                         <div class="agent-info"><h5 class="small fw-bold text-white mb-0">FADE</h5><p class="text-secondary-accent small mb-0">Iniciador</p></div>
                     </a>
 
-                    <a href="#" class="agent-box-v2 text-decoration-none">
+                    <a href="{% url 'agents_page' %}" class="agent-box-v2 text-decoration-none">
                         <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/820d36d431fff77b1e1ece39ad6f007746bd31f6-616x822.png?auto=format&fit=fill&q=80&w=352" alt="KillJoy" class="agent-img">
                         <div class="agent-info"><h5 class="small fw-bold text-white mb-0">KillJoy</h5><p class="text-secondary-accent small mb-0">Centinela</p></div>
                     </a>
                     
-                    <a href="#" class="agent-box-v2 text-decoration-none">
+                    <a href="{% url 'agents_page' %}" class="agent-box-v2 text-decoration-none">
                         <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/51e62f3c74356a7501d06feba42ac643133257d7-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Brimstone" class="agent-img">
                         <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Brimstone</h5><p class="text-secondary-accent small mb-0">Controlador</p></div>
                     </a>
 
-                    <a href="#" class="agent-box-v2 text-decoration-none">
+                    <a href="{% url 'agents_page' %}" class="agent-box-v2 text-decoration-none">
                         <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/7cb513c9b3eae3286449776e85753138436d553c-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Reyna" class="agent-img">
                         <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Reyna</h5><p class="text-secondary-accent small mb-0">Duelista</p></div>
                     </a>
                     
-                    <a href="#" class="agent-box-v2 text-decoration-none">
+                    <a href="{% url 'agents_page' %}" class="agent-box-v2 text-decoration-none">
                         <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/d41286dc9017bf79c0b4d907b7a260c27b0adb69-616x822.png?auto=format&fit=fill&q=80&w=352" alt="Jett" class="agent-img">
                         <div class="agent-info"><h5 class="small fw-bold text-white mb-0">Jett</h5><p class="text-secondary-accent small mb-0">Duelista</p></div>
                     </a>

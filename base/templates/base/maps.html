@@ -1,8 +1,8 @@
 {% extends "base/menu.html" %} 
 {% load static %}
+
 {% block content %}
 {% include "base/menu2.html" %}
-
 
 <style>
     /* VARIABLES DE COLOR LINEUP ANGLE */
@@ -15,7 +15,11 @@
         --text-muted: #88BEC5; 
     }
 
- 
+    body {
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
 
     /* Tarjeta de Mapa */
     .card {
@@ -97,18 +101,58 @@
         object-fit: contain;
     }
 
-    /* Botón Ver Detalles */
+    /* Botones de Acción */
     .btn-danger {
         background-color: var(--primary-color) !important;
         border-color: var(--primary-color) !important;
         color: var(--dark-bg) !important; 
         font-weight: bold;
-        margin-top: auto; 
     }
     .btn-danger:hover {
         background-color: #e63946 !important; 
     }
+
+    .btn-outline-info {
+        border-color: var(--accent-color) !important;
+        color: var(--accent-color) !important;
+        font-weight: bold;
+    }
+    .btn-outline-info:hover {
+        background-color: var(--accent-color) !important;
+        color: var(--dark-bg) !important;
+    }
     
+    /* Estilos para el Modal de Composición (Agentes) */
+    .comp-agent-card {
+        background-color: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        transition: transform 0.2s;
+        height: 100%; 
+    }
+    .comp-agent-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent-color);
+    }
+    .comp-agent-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary-color);
+        margin-bottom: 10px;
+    }
+    .role-badge {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+        margin-top: 5px;
+    }
+
     /* Fila del grid */
     .row.g-4 {
         --bs-gutter-x: 1.5rem;
@@ -149,6 +193,25 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="compModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="compModalTitle">Mejor Composición</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center text-muted mb-4">Agentes recomendados para este mapa según el meta actual.</p>
+                    
+                    <div class="row justify-content-center g-3" id="compModalBody">
+                        </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -163,7 +226,7 @@
     const lastUpdated = document.getElementById('lastUpdated');
     let allMaps = []; 
 
-    // LISTA NEGRA: Mapas que NO queremos mostrar
+    // LISTA NEGRA
     const excludedMaps = [
         'The Range', 'Basic Training', 'District', 'Kasbah', 'Piazza', 'Drift', 'Glitch', 'Escaramuza B', 'Escaramuza A', 'Escaramuza C', 'LA GALERÍA', 'La Galeria' , 'Entreniamienteo basico'
     ];
@@ -183,7 +246,98 @@
         "Abyss": "Mapa sin límites en los bordes, donde caer significa morir. Introduce mecánicas de riesgo alto."
     };
 
-    // Filtrado local (Buscador)
+
+    const bestComps = {
+        "Ascent": [
+            { name: "Jett", role: "Duelista", img: "JETT.png" },
+            { name: "Sova", role: "Iniciador", img: "SOVA.png" },
+            { name: "KAY/O", role: "Iniciador", img: "KAYO.png" },
+            { name: "Omen", role: "Controlador", img: "OMEN.png" },
+            { name: "Killjoy", role: "Sentinela", img: "KILLJOY.png" }
+        ],
+        "Bind": [
+            { name: "Raze", role: "Duelista", img: "RAZE.png" },
+            { name: "Skye", role: "Iniciador", img: "SKYE.png" },
+            { name: "Viper", role: "Controlador", img: "VIPER.png" },
+            { name: "Brimstone", role: "Controlador", img: "BRIMSTONE.png" },
+            { name: "Gekko", role: "Iniciador", img: "GEKKO.png" }
+        ],
+        "Haven": [
+            { name: "Jett", role: "Duelista", img: "JETT.png" },
+            { name: "Breach", role: "Iniciador", img: "BREACH.png" },
+            { name: "Sova", role: "Iniciador", img: "SOVA.png" },
+            { name: "Omen", role: "Controlador", img: "OMEN.png" },
+            { name: "Killjoy", role: "Sentinela", img: "KILLJOY.png" }
+        ],
+        "Split": [
+            { name: "Raze", role: "Duelista", img: "RAZE.png" },
+            { name: "Skye", role: "Iniciador", img: "SKYE.png" },
+            { name: "Omen", role: "Controlador", img: "OMEN.png" },
+            { name: "Viper", role: "Controlador", img: "VIPER.png" },
+            { name: "Cypher", role: "Sentinela", img: "CYPHER.png" }
+        ],
+        "Lotus": [
+            { name: "Raze", role: "Duelista", img: "RAZE.png" },
+            { name: "Fade", role: "Iniciador", img: "FADE.png" },
+            { name: "Viper", role: "Controlador", img: "VIPER.png" },
+            { name: "Omen", role: "Controlador", img: "OMEN.png" },
+            { name: "Killjoy", role: "Sentinela", img: "KILLJOY.png" }
+        ],
+        "Sunset": [
+            { name: "Raze", role: "Duelista", img: "RAZE.png" },
+            { name: "Fade", role: "Iniciador", img: "FADE.png" },
+            { name: "Breach", role: "Iniciador", img: "BREACH.png" },
+            { name: "Omen", role: "Controlador", img: "OMEN.png" },
+            { name: "Cypher", role: "Sentinela", img: "CYPHER.png" }
+        ],
+        "Breeze": [
+            { name: "Jett", role: "Duelista", img: "JETT.png" },
+            { name: "Sova", role: "Iniciador", img: "SOVA.png" },
+            { name: "KAY/O", role: "Iniciador", img: "KAYO.png" },
+            { name: "Viper", role: "Controlador", img: "VIPER.png" },
+            { name: "Cypher", role: "Sentinela", img: "CYPHER.png" }
+        ],
+        "Icebox": [
+            { name: "Jett", role: "Duelista", img: "JETT.png" },
+            { name: "Sova", role: "Iniciador", img: "SOVA.png" },
+            { name: "Viper", role: "Controlador", img: "VIPER.png" },
+            { name: "Killjoy", role: "Sentinela", img: "KILLJOY.png" },
+            { name: "Sage", role: "Sentinela", img: "SAGE.png" }
+        ],
+        "Fracture": [
+            { name: "Raze", role: "Duelista", img: "RAZE.png" },
+            { name: "Breach", role: "Iniciador", img: "BREACH.png" },
+            { name: "Brimstone", role: "Controlador", img: "BRIMSTONE.png" },
+            { name: "Viper", role: "Controlador", img: "VIPER.png" },
+            { name: "Killjoy", role: "Sentinela", img: "KILLJOY.png" }
+        ],
+        "Pearl": [
+            { name: "Jett", role: "Duelista", img: "JETT.png" },
+            { name: "Fade", role: "Iniciador", img: "FADE.png" },
+            { name: "Astra", role: "Controlador", img: "ASTRA.png" },
+            { name: "Viper", role: "Controlador", img: "VIPER.png" },
+            { name: "Killjoy", role: "Sentinela", img: "KILLJOY.png" }
+        ],
+        "Abyss": [
+            { name: "Jett", role: "Duelista", img: "JETT.png" },
+            { name: "Sova", role: "Iniciador", img: "SOVA.png" },
+            { name: "Omen", role: "Controlador", img: "OMEN.png" },
+            { name: "Cypher", role: "Sentinela", img: "CYPHER.png" },
+            { name: "KAY/O", role: "Iniciador", img: "KAYO.png" }
+        ]
+    };
+
+    // Composición por defecto
+    const defaultComp = [
+        { name: "Jett", role: "Duelista", img: "JETT.png" },
+        { name: "Sova", role: "Iniciador", img: "SOVA.png" },
+        { name: "Omen", role: "Controlador", img: "OMEN.png" },
+        { name: "Killjoy", role: "Sentinela", img: "KILLJOY.png" },
+        { name: "Skye", role: "Iniciador", img: "SKYE.png" }
+    ];
+
+
+    // Filtrado local
     searchInput?.addEventListener('input', (e) => {
         const q = e.target.value.trim().toLowerCase();
         document.querySelectorAll('.map-col').forEach(col => {
@@ -220,17 +374,53 @@
                         ${desc.slice(0, 100) + (desc.length > 100 ? '...' : '')}
                     </p>
 
-                    <button class="btn btn-danger w-100 view-map-btn">Ver Detalles</button>
+                    <div class="mt-auto d-flex gap-2">
+                        <button class="btn btn-danger flex-grow-1 view-map-btn">Detalles</button>
+                        <button class="btn btn-outline-info flex-grow-1 view-comp-btn" title="Ver mejor equipo">
+                            <i class="bi bi-people-fill"></i> Composición
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
         
         col.querySelector('.view-map-btn').onclick = () => openMapModal(map.uuid);
+        col.querySelector('.view-comp-btn').onclick = () => openCompModal(map.displayName);
         
         return col;
     }
 
-    // Abrir Modal
+    // Función para abrir el Modal de Composición
+    function openCompModal(mapName) {
+        document.getElementById('compModalTitle').textContent = "Mejor Composición: " + mapName.toUpperCase();
+        const compContainer = document.getElementById('compModalBody');
+        
+        const agents = bestComps[mapName] || defaultComp;
+        
+        let agentsHtml = '';
+        
+        agents.forEach(agent => {
+            // CORRECCIÓN CLAVE: Añadí 'images/avatars/' a la ruta estática
+            const finalImgSrc = "{% static 'images/avatars/' %}" + agent.img; 
+
+            agentsHtml += `
+                <div class="col-6 col-md-2">
+                    <div class="comp-agent-card">
+                        <img src="${finalImgSrc}" alt="${agent.name}" class="comp-agent-img">
+                        <h6 class="text-white mb-0">${agent.name}</h6>
+                        <span class="role-badge">${agent.role}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        compContainer.innerHTML = agentsHtml;
+        
+        const modal = new bootstrap.Modal(document.getElementById('compModal'));
+        modal.show();
+    }
+
+    // Abrir Modal de Detalles del Mapa
     function openMapModal(uuid) {
         const map = allMaps.find(m => m.uuid === uuid);
         if (!map) return;
@@ -321,5 +511,5 @@
 
     window.addEventListener('DOMContentLoaded', loadMaps);
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
 {% endblock %}
