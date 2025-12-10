@@ -166,7 +166,7 @@
         });
     }
 
-    // 3. Abrir Modal de Detalle (Adaptado para Armas)
+// 3. Abrir Modal de Detalle (Adaptado para Armas)
     window.openWeaponModal = function(uuid) {
         const weapon = allWeapons.find(w => w.uuid === uuid);
         if (!weapon) return;
@@ -179,6 +179,20 @@
         // -------------------------
         const stats = weapon.weaponStats;
         let statsHtml = '';
+
+        // *** INICIO DE LA MODIFICACIÓN NECESARIA ***
+        // Preprocesar el valor de wallPenetration para mostrar solo el nivel.
+        let wallPenetrationDisplay = '';
+        if (stats && stats.wallPenetration) {
+            // Dividir el string por ':' y tomar el último elemento (que es el nivel, ej: 'High')
+            wallPenetrationDisplay = stats.wallPenetration.split(':').pop();
+        } else if (stats) {
+            // Si stats existe pero wallPenetration no, asigna un valor por defecto o vacío
+            wallPenetrationDisplay = 'N/A';
+        }
+        // *** FIN DE LA MODIFICACIÓN NECESARIA ***
+
+
         if (stats) {
             statsHtml = `
                 <div class="row">
@@ -189,8 +203,8 @@
                         <div class="stat-group">
                             <strong style="color: #FF4655;">Precisión Primer Disparo:</strong> ${Math.round(stats.firstBulletAccuracy * 100)}%
                         </div>
-                         <div class="stat-group">
-                            <strong style="color: #FF4655;">Penetración de Muro:</strong> ${stats.wallPenetration}
+                        <div class="stat-group">
+                            <strong style="color: #FF4655;">Penetración de Muro:</strong> ${wallPenetrationDisplay}
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -210,6 +224,7 @@
 
         // -------------------------
         // B. HTML de Daño por Rango (Tabla)
+        // ... (el resto de la función sigue igual)
         // -------------------------
         let damageTableHtml = '';
         if (stats && stats.damageRanges) {
@@ -244,6 +259,7 @@
 
         // -------------------------
         // C. Cuerpo Completo del Modal (Diseño de 2 columnas)
+        // ... (el resto de la función sigue igual)
         // -------------------------
         document.getElementById('weaponModalBody').innerHTML = `
             <div class="row">
